@@ -74,6 +74,8 @@ html {
   scroll-behavior: smooth;
   color-scheme: dark;
   font-size: 16px;
+  touch-action: pan-x pan-y pinch-zoom;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
@@ -81,7 +83,10 @@ body {
   background-color: var(--bg-base);
   color: var(--text-main);
   line-height: 1.6;
-  overflow-x: hidden;
+  overflow-x: auto;
+  overflow-y: auto;
+  touch-action: pan-x pan-y pinch-zoom;
+  -webkit-overflow-scrolling: touch;
   position: relative;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
