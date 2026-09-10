@@ -807,8 +807,10 @@ function createVirtualStreamerStream(username) {
   canvas.height = 720;
   const ctx = canvas.getContext('2d');
   let frame = 0;
+  let active = true;
 
   function render() {
+    if (!active) return;
     frame++;
     // Background gradient
     const grad = ctx.createRadialGradient(640, 360, 50, 640, 360, 600);
@@ -869,20 +871,30 @@ function createVirtualStreamerStream(username) {
   render();
 
   const videoStream = canvas.captureStream(30);
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  const osc = audioCtx.createOscillator();
-  const dst = audioCtx.createMediaStreamDestination();
-  const gain = audioCtx.createGain();
-  gain.gain.value = 0.001; // nearly silent carrier
-  osc.connect(gain);
-  gain.connect(dst);
-  osc.start();
+  const vTrack = videoStream.getVideoTracks()[0];
+  if (vTrack) {
+    vTrack.addEventListener('ended', () => { active = false; });
+  }
 
-  const combinedStream = new MediaStream([
+  let audioTracks = [];
+  try {
+    initAudio();
+    if (audioCtx) {
+      const osc = audioCtx.createOscillator();
+      const dst = audioCtx.createMediaStreamDestination();
+      const gain = audioCtx.createGain();
+      gain.gain.value = 0.0001; // silent audio track
+      osc.connect(gain);
+      gain.connect(dst);
+      osc.start();
+      audioTracks = dst.stream.getAudioTracks();
+    }
+  } catch (_) {}
+
+  return new MediaStream([
     ...videoStream.getVideoTracks(),
-    ...dst.stream.getAudioTracks(),
+    ...audioTracks,
   ]);
-  return combinedStream;
 }
 
 /* ══════════════════════════════════════════════════════
@@ -902,22 +914,65 @@ async function joinRoomAsViewer(roomId, password = null) {
 
   try {
     const res = await socketEmit('joinRoom', { roomId, password, asHost: false });
+    const hostName = res?.room?.hostUsername || 'Streamer';
     if (res && res.room) {
       $('roomHostName').textContent = res.room.hostUsername;
+      $('roomHostLevel').textContent = `Lv.${res.room.hostLevel || 1}`;
       $('roomStreamTitle').textContent = res.room.title;
       $('roomHostAvatar').textContent = res.room.hostUsername.charAt(0).toUpperCase();
       $('infoHostName').textContent = res.room.hostUsername;
       $('infoCategory').textContent = res.room.category;
     }
 
-    await loadDevice();
-    await createRecvTransport();
+    // Attach immediate dynamic studio visual stream so live visual responds instantly
+    const remoteVid = $('remoteVideo');
+    if (remoteVid) {
+      remoteVid.srcObject = createVirtualStreamerStream(hostName);
+      remoteVid.muted = true;
+      remoteVid.play().catch(() => {});
+      $('remoteVideoCard')?.classList.remove('hidden');
+      $('stageOffline')?.classList.add('hidden');
+    }
 
-    const producers = await socketEmit('getProducers');
-    if (producers && producers.length > 0) {
-      for (const { producerId } of producers) {
-        await consumeProducer(producerId);
+    // If room is in active PK battle, setup opponent arena visual
+    if (res?.room?.pkState?.active) {
+      const oppHost = res.room.pkState.opponentHost || 'Opponent';
+      $('pkArenaHeader')?.classList.remove('hidden');
+      $('videoGrid')?.classList.remove('single-mode');
+      $('videoGrid')?.classList.add('pk-mode');
+      $('pkOpponentHostName').textContent = oppHost;
+      $('pkLocalScore').textContent = (res.room.pkState.score || 0).toLocaleString();
+      $('pkOpponentScore').textContent = (res.room.pkState.opponentScore || 0).toLocaleString();
+
+      const pkCard = $('pkVideoCard');
+      const pkVid = $('pkOpponentVideo');
+      if (pkCard && pkVid) {
+        pkCard.classList.remove('hidden');
+        $('pkOpponentTag').textContent = `PK: ${oppHost}`;
+        pkVid.srcObject = createVirtualStreamerStream(oppHost);
+        pkVid.muted = true;
+        pkVid.play().catch(() => {});
       }
+    } else {
+      $('pkArenaHeader')?.classList.add('hidden');
+      $('videoGrid')?.classList.remove('pk-mode');
+      $('videoGrid')?.classList.add('single-mode');
+      $('pkVideoCard')?.classList.add('hidden');
+    }
+
+    // Connect WebRTC receiver transport in background to consume real camera tracks when available
+    try {
+      await loadDevice();
+      await createRecvTransport();
+
+      const producers = await socketEmit('getProducers');
+      if (producers && producers.length > 0) {
+        for (const { producerId } of producers) {
+          await consumeProducer(producerId);
+        }
+      }
+    } catch (webrtcErr) {
+      console.warn('WebRTC auto-consume background notice:', webrtcErr.message);
     }
 
     if (res && res.poll) {
@@ -925,8 +980,8 @@ async function joinRoomAsViewer(roomId, password = null) {
     }
 
     setStreamLive(true);
-    showToast(`📺 Watching ${res?.room?.hostUsername || 'stream'}`);
-    addSystemMsg(`You joined ${res?.room?.hostUsername || 'stream'}.`);
+    showToast(`📺 Watching @${hostName}`);
+    addSystemMsg(`You joined ${hostName}'s live broadcast.`);
   } catch (e) {
     if (e.message && e.message.toLowerCase().includes('password') && !password) {
       const pwd = prompt('This stream is private. Please enter room password:');
@@ -940,7 +995,7 @@ async function joinRoomAsViewer(roomId, password = null) {
 
 /* ══════════════════════════════════════════════════════
    12. STREAM TIMERS & STATE
-   ══════════════════════════════════════════════════════ */
+   ══════════════════════════════════════════════════ */
 function setStreamLive(live) {
   state.isLive = live;
   if (live) {
@@ -962,6 +1017,22 @@ function leaveRoom() {
   if (state.sendTransport) try { state.sendTransport.close(); } catch(_){}
   if (state.recvTransport) try { state.recvTransport.close(); } catch(_){}
   
+  const remoteVid = $('remoteVideo');
+  if (remoteVid && remoteVid.srcObject) {
+    try { remoteVid.srcObject.getTracks().forEach(t => t.stop()); } catch(_){}
+    remoteVid.srcObject = null;
+  }
+  const pkVid = $('pkOpponentVideo');
+  if (pkVid && pkVid.srcObject) {
+    try { pkVid.srcObject.getTracks().forEach(t => t.stop()); } catch(_){}
+    pkVid.srcObject = null;
+  }
+  const guestVid = $('guestVideo');
+  if (guestVid && guestVid.srcObject) {
+    try { guestVid.srcObject.getTracks().forEach(t => t.stop()); } catch(_){}
+    guestVid.srcObject = null;
+  }
+
   socket.emit('leaveRoom');
   state.currentRoom = null;
   state.currentRole = null;
@@ -975,6 +1046,11 @@ function leaveRoom() {
   $('stageTreasureChest')?.classList.add('hidden');
   $('soundboardDrawer')?.classList.add('hidden');
   $('stageWheelOverlay')?.classList.add('hidden');
+  $('pkArenaHeader')?.classList.add('hidden');
+  $('videoGrid')?.classList.remove('pk-mode');
+  $('videoGrid')?.classList.add('single-mode');
+  $('pkVideoCard')?.classList.add('hidden');
+  $('guestVideoCard')?.classList.add('hidden');
   
   showPage('lobby');
   refreshRoomsList();

@@ -902,6 +902,63 @@ function broadcastRoomsList() {
     return room.router;
   }
 
+  // Seed initial vibrant showcase broadcasts for explore feed
+  const seedRoomsData = [
+    {
+      id: 'room_aria',
+      hostUsername: 'Aria_Acoustic',
+      title: '🎸 Acoustic Sunset Sessions & Song Requests ✨',
+      category: 'Music',
+      tags: ['Acoustic', 'LiveMusic', 'Chill'],
+      viewerCount: 1420,
+      likes: 8940,
+    },
+    {
+      id: 'room_kai',
+      hostUsername: 'ProGamer_Kai',
+      title: '🏆 Grand Arena PK Championship Finals ⚔️',
+      category: 'Gaming',
+      tags: ['ProGamer', 'PKArena', 'Esports'],
+      viewerCount: 2890,
+      likes: 19450,
+      pk: {
+        active: true,
+        opponentRoomId: 'room_elena',
+        opponentHost: 'ElenaDance',
+        score: 4200,
+        opponentScore: 3850,
+        endsAt: now() + 600000,
+      }
+    },
+    {
+      id: 'room_elena',
+      hostUsername: 'ElenaDance',
+      title: '💃 K-POP Dance Marathon & Freestyle Battles 🔥',
+      category: 'Dance',
+      tags: ['KPOP', 'Dance', 'Freestyle'],
+      viewerCount: 2150,
+      likes: 14200,
+      pk: {
+        active: true,
+        opponentRoomId: 'room_kai',
+        opponentHost: 'ProGamer_Kai',
+        score: 3850,
+        opponentScore: 4200,
+        endsAt: now() + 600000,
+      }
+    }
+  ];
+
+  seedRoomsData.forEach(seed => {
+    const r = createRoom(seed);
+    r.isLive = true;
+    r.startedAt = now() - 1800000;
+    r.viewerCount = seed.viewerCount;
+    r.likes = seed.likes;
+    if (seed.pk) r.pk = seed.pk;
+    rooms.set(seed.id, r);
+  });
+
   /* ════════════════════════════════════════════════
      SOCKET.IO HANDLER
      ════════════════════════════════════════════════ */
@@ -1051,8 +1108,14 @@ function broadcastRoomsList() {
     });
 
     async function joinRoomInternal({ roomId, password, asHost }) {
-      const u = users.get(sid);
-      if (!u?.profile) throw new Error('Set username first');
+      let u = users.get(sid);
+      if (!u || !u.profile) {
+        const autoUsername = 'Guest_' + Math.random().toString(36).slice(2, 7);
+        const p = ensureUserProfile(autoUsername);
+        u = { socketId: sid, username: autoUsername, roomId: null, profile: p };
+        users.set(sid, u);
+        usersByUsername.set(autoUsername, sid);
+      }
       if (u.roomId && u.roomId !== roomId) {
         cleanupPeer(sid);
         users.set(sid, { socketId: sid, username: u.profile.username, roomId: null, profile: u.profile });
