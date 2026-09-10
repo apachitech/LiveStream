@@ -21,6 +21,7 @@ function escHtml(str) {
     .replace(/&/g, '&amp;').replace(/</g, '&lt;')
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
+const escapeHtml = escHtml;
 
 function formatTime(ms) {
   const s = Math.floor(ms / 1000);
