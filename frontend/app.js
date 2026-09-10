@@ -371,6 +371,10 @@ const state = {
   mediaRecorder: null,
   recordedChunks: [],
   isRecording: false,
+  isCoHost: false,
+  coHosts: new Set(),
+  pendingGuestRequest: null,
+  guestStream: null,
 };
 
 /* ══════════════════════════════════════════════════════
@@ -685,7 +689,7 @@ async function createRecvTransport() {
   state.recvTransport = t;
 }
 
-async function consumeProducer(producerId, isPkOpponent = false) {
+async function consumeProducer(producerId, isPkOpponent = false, isGuest = false) {
   if (!state.recvTransport) await createRecvTransport();
 
   const { params } = await socketEmit('consume', {
@@ -702,49 +706,57 @@ async function consumeProducer(producerId, isPkOpponent = false) {
   });
   state.consumers.set(consumer.id, consumer);
 
-  const targetVideo = isPkOpponent ? $('pkOpponentVideo') : $('remoteVideo');
-  const targetCard = isPkOpponent ? $('pkVideoCard') : $('remoteVideoCard');
+  const targetVideo = isPkOpponent ? $('pkOpponentVideo') : (isGuest ? $('guestVideo') : $('remoteVideo'));
+  const targetCard = isPkOpponent ? $('pkVideoCard') : (isGuest ? $('guestVideoCard') : $('remoteVideoCard'));
 
-  let stream = targetVideo.srcObject;
-  if (stream instanceof MediaStream) {
-    if (params.kind === 'video') {
-      stream.getVideoTracks().forEach(t => {
-        try { t.stop(); } catch(_){}
-        stream.removeTrack(t);
-      });
-    } else if (params.kind === 'audio') {
-      stream.getAudioTracks().forEach(t => {
-        try { t.stop(); } catch(_){}
-        stream.removeTrack(t);
-      });
+  if (targetVideo) {
+    let stream = targetVideo.srcObject;
+    if (stream instanceof MediaStream) {
+      if (params.kind === 'video') {
+        stream.getVideoTracks().forEach(t => {
+          try { t.stop(); } catch(_){}
+          stream.removeTrack(t);
+        });
+      } else if (params.kind === 'audio') {
+        stream.getAudioTracks().forEach(t => {
+          try { t.stop(); } catch(_){}
+          stream.removeTrack(t);
+        });
+      }
+    } else {
+      stream = new MediaStream();
     }
-  } else {
-    stream = new MediaStream();
+    stream.addTrack(consumer.track);
+
+    // Assign fresh stream reference so video element detects newly added tracks
+    targetVideo.srcObject = stream;
+    targetCard?.classList.remove('hidden');
+    $('stageOffline')?.classList.add('hidden');
+
+    if (isGuest) {
+      $('videoGrid')?.classList.remove('single-mode');
+      $('videoGrid')?.classList.add('multi-guest-mode');
+    }
+
+    // Resume consumer on server to trigger RTP delivery & keyframe
+    socketEmit('resumeConsumer', { consumerId: consumer.id }).catch(e => console.warn('resumeConsumer err:', e.message));
+
+    // Play stream with muted autoplay fallback
+    targetVideo.play().catch(e => {
+      console.warn('Unmuted autoplay blocked, retrying with muted:', e);
+      targetVideo.muted = true;
+      targetVideo.play().catch(err => console.error('Play error:', err));
+    });
   }
-  stream.addTrack(consumer.track);
-
-  // Assign fresh stream reference so video element detects newly added tracks
-  targetVideo.srcObject = stream;
-  targetCard?.classList.remove('hidden');
-  $('stageOffline')?.classList.add('hidden');
-
-  // Resume consumer on server to trigger RTP delivery & keyframe
-  socketEmit('resumeConsumer', { consumerId: consumer.id }).catch(e => console.warn('resumeConsumer err:', e.message));
-
-  // Play stream with muted autoplay fallback
-  targetVideo.play().catch(e => {
-    console.warn('Unmuted autoplay blocked, retrying with muted:', e);
-    targetVideo.muted = true;
-    targetVideo.play().catch(err => console.error('Play error:', err));
-  });
 
   return consumer;
 }
 
-socket.on('newProducer', async ({ producerId }) => {
-  if (state.currentRole !== 'viewer' || !state.device) return;
+socket.on('newProducer', async ({ producerId, username, kind }) => {
+  if (!state.device) return;
   try {
-    await consumeProducer(producerId);
+    const isGuestProd = (username && username !== state.currentRoom?.hostUsername) || state.coHosts.has(username) || state.currentRole === 'host';
+    await consumeProducer(producerId, false, isGuestProd);
   } catch (e) {
     console.warn('newProducer error:', e.message);
   }
@@ -990,6 +1002,22 @@ async function joinRoomAsViewer(roomId, password = null) {
       $('pkVideoCard')?.classList.add('hidden');
     }
 
+    // If room has active co-hosts on stage, render multi-guest layout
+    if (res && Array.isArray(res.coHosts) && res.coHosts.length > 0) {
+      res.coHosts.forEach(ch => state.coHosts.add(ch));
+      const guestName = res.coHosts[0];
+      $('videoGrid')?.classList.remove('single-mode');
+      $('videoGrid')?.classList.add('multi-guest-mode');
+      $('guestVideoCard')?.classList.remove('hidden');
+      $('guestTag').textContent = `🎙️ ${guestName}`;
+      const guestVid = $('guestVideo');
+      if (guestVid && !guestVid.srcObject) {
+        guestVid.srcObject = createVirtualStreamerStream(guestName);
+        guestVid.muted = true;
+        guestVid.play().catch(() => {});
+      }
+    }
+
     // Connect WebRTC receiver transport in background to consume real camera tracks when available
     try {
       await loadDevice();
@@ -997,8 +1025,9 @@ async function joinRoomAsViewer(roomId, password = null) {
 
       const producers = await socketEmit('getProducers');
       if (producers && producers.length > 0) {
-        for (const { producerId } of producers) {
-          await consumeProducer(producerId);
+        for (const p of producers) {
+          const isGuestProd = (p.username && p.username !== hostName) || state.coHosts.has(p.username);
+          await consumeProducer(p.producerId, false, isGuestProd);
         }
       }
     } catch (webrtcErr) {
@@ -1063,6 +1092,20 @@ function leaveRoom() {
     guestVid.srcObject = null;
   }
 
+  state.isCoHost = false;
+  state.coHosts.clear();
+  state.pendingGuestRequest = null;
+  if (state.guestStream) {
+    try { state.guestStream.getTracks().forEach(t => t.stop()); } catch(_){}
+    state.guestStream = null;
+  }
+  const joinSeatBtn = $('btnRequestGuestSeat');
+  if (joinSeatBtn) {
+    joinSeatBtn.textContent = '🎙️ Join Stage';
+    joinSeatBtn.style.color = 'var(--cyan)';
+    joinSeatBtn.style.borderColor = 'rgba(6,214,230,0.3)';
+  }
+
   socket.emit('leaveRoom');
   state.currentRoom = null;
   state.currentRole = null;
@@ -1078,9 +1121,11 @@ function leaveRoom() {
   $('stageWheelOverlay')?.classList.add('hidden');
   $('pkArenaHeader')?.classList.add('hidden');
   $('videoGrid')?.classList.remove('pk-mode');
+  $('videoGrid')?.classList.remove('multi-guest-mode');
   $('videoGrid')?.classList.add('single-mode');
   $('pkVideoCard')?.classList.add('hidden');
   $('guestVideoCard')?.classList.add('hidden');
+  $('guestLeaveBtn')?.classList.add('hidden');
   
   showPage('lobby');
   refreshRoomsList();
@@ -2674,7 +2719,214 @@ document.addEventListener('click', (e) => {
   }
 });
 
-/* Co-Host Invite from Host */
+/* ══════════════════════════════════════════════════════
+   20. MULTI-GUEST & CO-HOST STAGE SEATING SYSTEM
+   ══════════════════════════════════════════════════════ */
+
+// 1. Viewer requests to join stage
+$('btnRequestGuestSeat')?.addEventListener('click', async () => {
+  if (state.isCoHost) {
+    if (confirm('Leave the co-host stage and return to audience?')) {
+      await leaveGuestSeat();
+    }
+    return;
+  }
+  if (!state.currentRoom) return showToast('You are not in a live stream');
+
+  try {
+    initAudio();
+    const res = await socketEmit('requestCoHost', { roomId: state.currentRoom.id });
+    if (res?.error) {
+      showToast('❌ ' + res.error);
+    } else {
+      showToast('🎙️ Stage request sent to host! Waiting for approval…');
+    }
+  } catch (e) {
+    showToast('❌ ' + e.message);
+  }
+});
+
+// 2. Host receives stage join request from viewer
+socket.on('coHostRequestReceived', ({ from, level, fromSocketId, roomId }) => {
+  if (state.currentRole !== 'host') return;
+  state.pendingGuestRequest = { from, level, fromSocketId, roomId };
+
+  const avatarEl = $('guestRequestAvatar');
+  if (avatarEl) {
+    avatarEl.textContent = (from || 'G').charAt(0).toUpperCase();
+    avatarEl.style.background = avatarColor(from);
+  }
+  const titleEl = $('guestRequestTitle');
+  if (titleEl) {
+    titleEl.textContent = `@${from} (Lv.${level || 1}) wants to join the stage!`;
+  }
+
+  $('modalGuestRequest')?.classList.remove('hidden');
+  playSfx('coin');
+  showToast(`🎙️ @${from} requested to join the stage with camera & mic!`);
+});
+
+// 3. Host accepts guest request
+$('acceptGuestRequestBtn')?.addEventListener('click', async () => {
+  if (!state.pendingGuestRequest) return;
+  const targetUsername = state.pendingGuestRequest.from;
+  const roomId = state.currentRoom?.id;
+
+  try {
+    $('acceptGuestRequestBtn').disabled = true;
+    $('acceptGuestRequestBtn').textContent = 'Connecting…';
+    await socketEmit('approveCoHostRequest', { targetUsername, roomId });
+    $('modalGuestRequest')?.classList.add('hidden');
+    $('acceptGuestRequestBtn').disabled = false;
+    $('acceptGuestRequestBtn').textContent = '✨ Accept & Connect';
+
+    state.coHosts.add(targetUsername);
+    showToast(`✨ Approved @${targetUsername} to join the stage!`);
+    state.pendingGuestRequest = null;
+  } catch (e) {
+    showToast('❌ ' + e.message);
+    $('acceptGuestRequestBtn').disabled = false;
+    $('acceptGuestRequestBtn').textContent = '✨ Accept & Connect';
+  }
+});
+
+// Host declines guest request
+$('declineGuestRequestBtn')?.addEventListener('click', () => {
+  $('modalGuestRequest')?.classList.add('hidden');
+  state.pendingGuestRequest = null;
+});
+
+// 4. Viewer receives approval to join stage as Co-Host
+socket.on('coHostRequestApproved', async ({ roomId, hostUsername }) => {
+  try {
+    state.isCoHost = true;
+    const btn = $('btnRequestGuestSeat');
+    if (btn) {
+      btn.textContent = '✅ Leave Stage';
+      btn.style.color = 'var(--danger)';
+      btn.style.borderColor = 'rgba(239, 68, 68, 0.5)';
+    }
+
+    // Capture camera/mic (with fallback)
+    try {
+      state.guestStream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 24 } },
+        audio: { echoCancellation: true, noiseSuppression: true }
+      });
+    } catch (camErr) {
+      console.warn('Physical camera/mic not available, using studio virtual streamer fallback:', camErr);
+      state.guestStream = createVirtualStreamerStream(state.user.username);
+    }
+
+    const guestVid = $('guestVideo');
+    if (guestVid) {
+      guestVid.srcObject = state.guestStream;
+      guestVid.muted = true;
+      guestVid.play().catch(() => {});
+    }
+
+    $('guestVideoCard')?.classList.remove('hidden');
+    $('guestLeaveBtn')?.classList.remove('hidden');
+    $('guestTag').textContent = `🎙️ YOU (Guest)`;
+    $('videoGrid')?.classList.remove('single-mode');
+    $('videoGrid')?.classList.add('multi-guest-mode');
+
+    // Produce tracks via Mediasoup SFU
+    await loadDevice();
+    if (!state.sendTransport) await createSendTransport();
+
+    const videoTrack = state.guestStream.getVideoTracks()[0];
+    const audioTrack = state.guestStream.getAudioTracks()[0];
+
+    if (videoTrack) state.producers.guestVideo = await state.sendTransport.produce({ track: videoTrack });
+    if (audioTrack) state.producers.guestAudio = await state.sendTransport.produce({ track: audioTrack });
+
+    playSfx('victory');
+    showToast(`🎉 You are now live on stage with @${hostUsername}!`);
+    addSystemMsg(`You joined the live stage as Co-Host.`);
+  } catch (e) {
+    console.error('Co-host stage setup error:', e);
+    showToast('❌ Error joining stage: ' + e.message);
+  }
+});
+
+// 5. Host & all viewers receive notification that a co-host joined
+socket.on('coHostJoined', async ({ username, level }) => {
+  if (username === state.user.username) return; // handled by coHostRequestApproved
+  state.coHosts.add(username);
+
+  $('guestTag').textContent = `🎙️ ${username} (Lv.${level || 1})`;
+  $('guestVideoCard')?.classList.remove('hidden');
+  $('videoGrid')?.classList.remove('single-mode');
+  $('videoGrid')?.classList.add('multi-guest-mode');
+
+  const guestVid = $('guestVideo');
+  if (guestVid && !guestVid.srcObject) {
+    guestVid.srcObject = createVirtualStreamerStream(username);
+    guestVid.muted = true;
+    guestVid.play().catch(() => {});
+  }
+
+  showToast(`🎙️ @${username} joined the stage!`);
+  addSystemMsg(`@${username} joined the stage as Co-Host.`);
+});
+
+// 6. Leaving or removing co-host
+$('guestLeaveBtn')?.addEventListener('click', () => {
+  if (confirm('Leave the co-host seat?')) {
+    leaveGuestSeat();
+  }
+});
+
+async function leaveGuestSeat() {
+  if (state.guestStream) {
+    try { state.guestStream.getTracks().forEach(t => t.stop()); } catch(_) {}
+    state.guestStream = null;
+  }
+  if (state.producers.guestVideo) {
+    try { state.producers.guestVideo.close(); } catch(_) {}
+    delete state.producers.guestVideo;
+  }
+  if (state.producers.guestAudio) {
+    try { state.producers.guestAudio.close(); } catch(_) {}
+    delete state.producers.guestAudio;
+  }
+
+  socket.emit('removeCoHost', { targetUsername: state.user.username, roomId: state.currentRoom?.id });
+  state.isCoHost = false;
+
+  $('guestVideoCard')?.classList.add('hidden');
+  $('guestLeaveBtn')?.classList.add('hidden');
+  $('videoGrid')?.classList.remove('multi-guest-mode');
+  $('videoGrid')?.classList.add(state.currentRoom?.pk?.active ? 'pk-mode' : 'single-mode');
+
+  const btn = $('btnRequestGuestSeat');
+  if (btn) {
+    btn.textContent = '🎙️ Join Stage';
+    btn.style.color = 'var(--cyan)';
+    btn.style.borderColor = 'rgba(6,214,230,0.3)';
+  }
+
+  showToast('You have left the stage.');
+}
+
+socket.on('coHostLeft', ({ username }) => {
+  state.coHosts.delete(username);
+  if (state.coHosts.size === 0) {
+    $('guestVideoCard')?.classList.add('hidden');
+    $('videoGrid')?.classList.remove('multi-guest-mode');
+    $('videoGrid')?.classList.add(state.currentRoom?.pk?.active ? 'pk-mode' : 'single-mode');
+    const guestVid = $('guestVideo');
+    if (guestVid && guestVid.srcObject) {
+      try { guestVid.srcObject.getTracks().forEach(t => t.stop()); } catch(_) {}
+      guestVid.srcObject = null;
+    }
+  }
+  showToast(`🎙️ @${username} left the stage.`);
+  addSystemMsg(`@${username} left the stage.`);
+});
+
+// 7. Host invites user from context menu
 $('ctxInviteCoHost')?.addEventListener('click', async () => {
   if (!targetContextUser) return;
   try {
@@ -2686,70 +2938,32 @@ $('ctxInviteCoHost')?.addEventListener('click', async () => {
   }
 });
 
-/* Viewer receives Co-Host invite */
+// 8. Incoming co-host invitation from Host
 socket.on('coHostInvite', ({ from, roomId }) => {
-  $('coHostInviteHost').textContent = `${from} has invited you to join as Co-Host!`;
+  const hostEl = $('coHostInviteHost');
+  if (hostEl) hostEl.textContent = `@${from} has invited you to co-host!`;
+  const avatarEl = $('coHostInviteAvatar');
+  if (avatarEl) {
+    avatarEl.textContent = (from || 'H').charAt(0).toUpperCase();
+    avatarEl.style.background = avatarColor(from);
+  }
   $('modalCoHostInvite')?.classList.remove('hidden');
-  playSfx('superchat');
-
-  $('acceptCoHostBtn').onclick = async () => {
-    try {
-      await socketEmit('acceptCoHost', { roomId });
-      $('modalCoHostInvite')?.classList.add('hidden');
-      showToast('🎙️ You are now Co-Hosting! Starting camera…');
-
-      // Start producing co-host video/audio
-      await loadDevice();
-      if (!state.sendTransport) await createSendTransport();
-      state.localStream = createVirtualStreamerStream(state.user.username);
-      const videoTrack = state.localStream.getVideoTracks()[0];
-      const audioTrack = state.localStream.getAudioTracks()[0];
-      if (videoTrack) state.producers.video = await state.sendTransport.produce({ track: videoTrack });
-      if (audioTrack) state.producers.audio = await state.sendTransport.produce({ track: audioTrack });
-
-      const guestVid = $('guestVideo');
-      if (guestVid) {
-        guestVid.srcObject = state.localStream;
-        guestVid.muted = true;
-        guestVid.play().catch(() => {});
-        $('guestVideoCard')?.classList.remove('hidden');
-        $('guestLeaveBtn')?.classList.remove('hidden');
-      }
-    } catch (e) {
-      showToast('❌ ' + e.message);
-    }
-  };
-
-  $('declineCoHostBtn').onclick = () => {
-    $('modalCoHostInvite')?.classList.add('hidden');
-  };
+  playSfx('coin');
 });
 
-/* Co-Host Events */
-socket.on('coHostJoined', ({ username }) => {
-  showToast(`🎙️ ${username} joined the stage as Co-Host!`);
-  const guestCard = $('guestVideoCard');
-  const guestVid = $('guestVideo');
-  if (guestCard && guestVid && username !== state.user.username) {
-    guestCard.classList.remove('hidden');
-    $('guestTag').textContent = `CO-HOST: ${username}`;
-    guestVid.srcObject = createVirtualStreamerStream(username);
-    guestVid.muted = true;
-    guestVid.play().catch(() => {});
+$('acceptCoHostBtn')?.addEventListener('click', async () => {
+  $('modalCoHostInvite')?.classList.add('hidden');
+  try {
+    await socketEmit('acceptCoHost', { roomId: state.currentRoom?.id });
+    // Trigger stage connection
+    socket.emit('requestCoHost', { roomId: state.currentRoom?.id });
+  } catch (e) {
+    showToast('❌ ' + e.message);
   }
 });
 
-socket.on('coHostLeft', ({ username }) => {
-  showToast(`🎙️ ${username} left co-host seat.`);
-  $('guestVideoCard')?.classList.add('hidden');
-});
-
-$('guestLeaveBtn')?.addEventListener('click', () => {
-  $('guestVideoCard')?.classList.add('hidden');
-  $('guestLeaveBtn')?.classList.add('hidden');
-  if (state.producers.video) try { state.producers.video.close(); } catch(_){}
-  if (state.producers.audio) try { state.producers.audio.close(); } catch(_){}
-  showToast('You left the co-host stage.');
+$('declineCoHostBtn')?.addEventListener('click', () => {
+  $('modalCoHostInvite')?.classList.add('hidden');
 });
 
 $('ctxMuteUser')?.addEventListener('click', async () => {

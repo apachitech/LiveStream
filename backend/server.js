@@ -1221,7 +1221,11 @@ function broadcastRoomsList() {
         room.viewerSockets.delete(sid);
         room.viewerCount = Math.max(0, room.viewerCount - 1);
         broadcastViewerCount(room);
-        io.to(roomId).emit('peerLeft', { username });
+        if (room.coHosts.has(username)) {
+          room.coHosts.delete(username);
+          io.to(roomId).emit('coHostLeft', { username });
+          io.to(roomId).emit('coHostsUpdated', { coHosts: [...room.coHosts] });
+        }
         // If host leaves, end stream (but keep room state)
         if (room.hostSocketId === sid) {
           room.hostSocketId = null;
@@ -1373,7 +1377,9 @@ function broadcastRoomsList() {
         consumer._transportId = transportId;
         if (consumer.kind === 'video' && typeof consumer.requestKeyFrame === 'function') {
           setTimeout(() => {
-            try { consumer.requestKeyFrame(); } catch (_) {}
+            if (!consumer.closed) {
+              consumer.requestKeyFrame().catch(() => {});
+            }
           }, 100);
         }
         consumer.on('transportclose', () => { try { consumer.close(); } catch(_){} room.consumers.delete(consumer.id); });
@@ -1398,8 +1404,8 @@ function broadcastRoomsList() {
         const consumer = room.consumers.get(consumerId);
         if (!consumer) return cb && cb({ error: 'consumer not found' });
         await consumer.resume();
-        if (consumer.kind === 'video' && typeof consumer.requestKeyFrame === 'function') {
-          try { consumer.requestKeyFrame(); } catch(_) {}
+        if (consumer.kind === 'video' && !consumer.closed && typeof consumer.requestKeyFrame === 'function') {
+          consumer.requestKeyFrame().catch(() => {});
         }
         cb && cb('ok');
       } catch (e) { cb && cb({ error: e.message }); }
@@ -1648,7 +1654,7 @@ function broadcastRoomsList() {
     });
 
     /* ══════════════════════════════════════════════
-       CO-HOSTING
+       CO-HOSTING & MULTI-GUEST STAGE SEATS
        ══════════════════════════════════════════════ */
 
     socket.on('inviteCoHost', ({ targetUsername, roomId }, cb) => {
@@ -1664,6 +1670,40 @@ function broadcastRoomsList() {
       io.to(targetSid).emit('coHostInvite', {
         from: u.profile.username, roomId: room.id,
       });
+      cb && cb({ ok: true });
+    });
+
+    socket.on('requestCoHost', ({ roomId }, cb) => {
+      const room = roomId ? rooms.get(roomId) : getPeerRoom(sid).room;
+      if (!room) return cb && cb({ error: 'Not in room' });
+      const u = users.get(sid);
+      if (!u?.profile) return cb && cb({ error: 'Not logged in' });
+      if (u.profile.username === room.hostUsername || room.coHosts.has(u.profile.username)) {
+        return cb && cb({ error: 'Already on stage' });
+      }
+      if (room.hostSocketId) {
+        io.to(room.hostSocketId).emit('coHostRequestReceived', {
+          from: u.profile.username,
+          level: u.profile.level,
+          fromSocketId: sid,
+          roomId: room.id,
+        });
+      }
+      cb && cb({ ok: true });
+    });
+
+    socket.on('approveCoHostRequest', async ({ targetUsername, roomId }, cb) => {
+      const room = roomId ? rooms.get(roomId) : getPeerRoom(sid).room;
+      if (!room) return cb && cb({ error: 'Not in room' });
+      const u = users.get(sid);
+      if (u?.profile?.username !== room.hostUsername) return cb && cb({ error: 'Host only' });
+      const targetSid = usersByUsername.get(targetUsername);
+      if (!targetSid) return cb && cb({ error: 'Viewer not found' });
+      room.coHosts.add(targetUsername);
+      room.mods.add(targetUsername);
+      io.to(targetSid).emit('coHostRequestApproved', { roomId: room.id, hostUsername: room.hostUsername });
+      io.to(room.id).emit('coHostJoined', { username: targetUsername, level: userStore.get(targetUsername)?.level || 1 });
+      io.to(room.id).emit('coHostsUpdated', { coHosts: [...room.coHosts] });
       cb && cb({ ok: true });
     });
 
@@ -1684,7 +1724,9 @@ function broadcastRoomsList() {
       const room = roomId ? rooms.get(roomId) : getPeerRoom(sid).room;
       if (!room) return cb && cb({ error: 'Not in room' });
       const u = users.get(sid);
-      if (u?.profile?.username !== room.hostUsername) return cb && cb({ error: 'Host only' });
+      if (u?.profile?.username !== room.hostUsername && u?.profile?.username !== targetUsername) {
+        return cb && cb({ error: 'Unauthorized' });
+      }
       room.coHosts.delete(targetUsername);
       // close their producers
       for (const [pid, producer] of room.producers) {

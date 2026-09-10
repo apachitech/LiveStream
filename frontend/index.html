@@ -490,6 +490,7 @@
 
           <!-- Interactive Action Buttons -->
           <div class="stage-actions-right">
+            <button class="btn btn-ghost btn-sm" id="btnRequestGuestSeat" style="color:var(--cyan); border-color:rgba(6,214,230,0.3);" title="Join the stage with camera & mic to broadcast together">🎙️ Join Stage</button>
             <button class="btn btn-superchat" id="openSuperChatBtn" title="Send a Super Chat message">💬 Super Chat</button>
             <button class="btn btn-gift pulse-glow" id="openGiftDrawerBtn" title="Send Virtual Gifts">🎁 Send Gift</button>
             <button class="btn-like-heart" id="likeStreamBtn" title="Double tap or click to like">
@@ -1353,6 +1354,21 @@
       <div class="modal-footer mt-3">
         <button class="btn btn-ghost" id="declineCoHostBtn">Decline</button>
         <button class="btn btn-primary pulse-glow" id="acceptCoHostBtn">✨ Accept & Go Live</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Host receives guest stage join request -->
+  <div class="modal-backdrop hidden" id="modalGuestRequest">
+    <div class="modal-card glass-panel cohost-invite-card">
+      <div class="cohost-invite-badge">🎙️ STAGE JOIN REQUEST</div>
+      <div class="cohost-invite-avatar" id="guestRequestAvatar">👤</div>
+      <h3 id="guestRequestTitle">Viewer wants to join the stage!</h3>
+      <p style="font-size:0.85rem; color:var(--text-2); text-align:center;">Share your live broadcast screen with this viewer as a co-host guest.</p>
+      
+      <div class="modal-footer mt-3" style="flex-direction:row; justify-content:center; gap:12px;">
+        <button class="btn btn-ghost" id="declineGuestRequestBtn">Decline</button>
+        <button class="btn btn-primary pulse-glow" id="acceptGuestRequestBtn">✨ Accept & Connect</button>
       </div>
     </div>
   </div>
