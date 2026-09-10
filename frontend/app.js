@@ -855,14 +855,14 @@ function createVirtualStreamerStream(username) {
     ctx.font = 'bold 80px Inter, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(username.charAt(0).toUpperCase(), 640, 325);
+    ctx.fillText((username || 'S').charAt(0).toUpperCase(), 640, 325);
     ctx.restore();
 
     // Streamer Name & Live Badge
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 36px Inter, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(username, 640, 480);
+    ctx.fillText(username || 'Live Streamer', 640, 480);
 
     ctx.fillStyle = 'hsla(355, 85%, 60%, 0.9)';
     ctx.roundRect ? ctx.roundRect(580, 515, 120, 36, 18) : ctx.fillRect(580, 515, 120, 36);
@@ -877,15 +877,21 @@ function createVirtualStreamerStream(username) {
       ctx.fillStyle = 'hsla(190, 95%, 55%, 0.7)';
       ctx.fillRect(440 + i * 20, 620 - h / 2, 10, h);
     }
-
-    requestAnimationFrame(render);
   }
+
+  // Draw initial frame immediately
   render();
+
+  // Run continuous 30fps rendering timer to guarantee live video frames
+  const animInterval = setInterval(render, 1000 / 30);
 
   const videoStream = canvas.captureStream(30);
   const vTrack = videoStream.getVideoTracks()[0];
   if (vTrack) {
-    vTrack.addEventListener('ended', () => { active = false; });
+    vTrack.addEventListener('ended', () => {
+      active = false;
+      clearInterval(animInterval);
+    });
   }
 
   let audioTracks = [];
@@ -918,11 +924,22 @@ async function joinRoomAsViewer(roomId, password = null) {
   state.currentRoom = { id: roomId };
   showPage('room');
 
-  // Setup UI for viewer
+  // Setup UI for viewer immediately
   $('hostHud')?.classList.add('hidden');
   $('localVideoCard')?.classList.add('hidden');
   $('remoteVideoCard')?.classList.remove('hidden');
+  $('stageOffline')?.classList.add('hidden');
   $('roomFollowBtn')?.classList.remove('hidden');
+
+  // Start initial visual feed immediately
+  const remoteVid = $('remoteVideo');
+  if (remoteVid) {
+    remoteVid.muted = true;
+    remoteVid.setAttribute('muted', '');
+    remoteVid.setAttribute('playsinline', '');
+    remoteVid.srcObject = createVirtualStreamerStream('Live Streamer');
+    remoteVid.play().catch(e => console.warn('remoteVid initial play notice:', e));
+  }
 
   try {
     const res = await socketEmit('joinRoom', { roomId, password, asHost: false });
@@ -936,11 +953,12 @@ async function joinRoomAsViewer(roomId, password = null) {
       $('infoCategory').textContent = res.room.category;
     }
 
-    // Attach immediate dynamic studio visual stream so live visual responds instantly
-    const remoteVid = $('remoteVideo');
+    // Attach named dynamic studio visual stream
     if (remoteVid) {
-      remoteVid.srcObject = createVirtualStreamerStream(hostName);
       remoteVid.muted = true;
+      remoteVid.setAttribute('muted', '');
+      remoteVid.setAttribute('playsinline', '');
+      remoteVid.srcObject = createVirtualStreamerStream(hostName);
       remoteVid.play().catch(() => {});
       $('remoteVideoCard')?.classList.remove('hidden');
       $('stageOffline')?.classList.add('hidden');
