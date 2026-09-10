@@ -64,7 +64,7 @@ module.exports = {
     listenIps: [
       {
         ip: '0.0.0.0',
-        announcedIp: process.env.MEDIASOUP_ANNOUNCED_IP || process.env.RENDER_EXTERNAL_HOSTNAME || localIp,
+        announcedIp: process.env.MEDIASOUP_ANNOUNCED_IP || localIp,
       },
     ],
     initialAvailableOutgoingBitrate: 1000000,
