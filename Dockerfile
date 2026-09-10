@@ -6,6 +6,12 @@ ENV PIP_BREAK_SYSTEM_PACKAGES=1
 ENV NODE_ENV=production
 ENV PORT=3000
 
+# Limit C++ compilation concurrency to 1 thread to stay well under memory limits
+ENV MAKEFLAGS="-j1"
+ENV NINJA_JOBS=1
+ENV MAX_JOBS=1
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+
 # Install build tools, Python, and pip required by Mediasoup C++ worker
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
@@ -21,8 +27,8 @@ WORKDIR /app
 # Copy dependency definitions
 COPY package*.json ./
 
-# Install dependencies and compile Mediasoup worker
-RUN npm install --omit=dev --no-audit --no-fund
+# Install dependencies and compile Mediasoup worker with single-job limit
+RUN MAKEFLAGS="-j1" NINJA_JOBS=1 MAX_JOBS=1 npm install --omit=dev --no-audit --no-fund
 
 # Copy application source
 COPY . .
