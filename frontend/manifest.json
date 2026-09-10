@@ -1,0 +1,42 @@
+{
+  "name": "LiveWave — Live Stream & PK Battles",
+  "short_name": "LiveWave",
+  "description": "Next-Gen Live Video Streaming, PK Battles, African Mobile Money Recharge & Creator Gifting Platform.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#060812",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%237c3aed'/><path d='M38 30 L72 50 L38 70 Z' fill='%23ffffff'/><circle cx='50' cy='50' r='44' fill='none' stroke='%2306d6e0' stroke-width='4'/></svg>",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%237c3aed'/><path d='M38 30 L72 50 L38 70 Z' fill='%23ffffff'/><circle cx='50' cy='50' r='44' fill='none' stroke='%2306d6e0' stroke-width='4'/></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["entertainment", "social", "video"],
+  "shortcuts": [
+    {
+      "name": "Go Live",
+      "url": "/?golive=true",
+      "description": "Start a live broadcast instantly"
+    },
+    {
+      "name": "Buy Coins",
+      "url": "/?buycoins=true",
+      "description": "Recharge coins via Mobile Money"
+    },
+    {
+      "name": "Admin Center",
+      "url": "/admin",
+      "description": "Open Admin Command Center"
+    }
+  ]
+}

@@ -1,0 +1,378 @@
+{
+  "users": {
+    "Admin_Master": {
+      "username": "Admin_Master",
+      "role": "admin",
+      "level": 25,
+      "xp": 31250,
+      "coins": 50000,
+      "diamonds": 18500,
+      "avatarSeed": "Admin_Master",
+      "followers": [],
+      "following": [],
+      "totalGiftsSent": 120,
+      "totalGiftsValue": 45000,
+      "totalGiftsReceived": 350,
+      "totalGiftsReceivedValue": 98000,
+      "streamsHosted": 15,
+      "bio": "Platform Lead Administrator & WebRTC Engineer 🛡️",
+      "isBanned": false,
+      "isVerifiedStreamer": true,
+      "joinedAt": 1785609839952,
+      "passwordHash": "88b3e4fc80f00d3fb406d727155b85e81567d798a73b6261796788c41c1a3496"
+    },
+    "Aria_Acoustic": {
+      "username": "Aria_Acoustic",
+      "role": "streamer",
+      "level": 14,
+      "xp": 9800,
+      "coins": 12500,
+      "diamonds": 29200,
+      "avatarSeed": "Aria_Acoustic",
+      "followers": [
+        "Admin_Master",
+        "CyberNova",
+        "StarlightAlex"
+      ],
+      "following": [
+        "Admin_Master"
+      ],
+      "totalGiftsSent": 45,
+      "totalGiftsValue": 12000,
+      "totalGiftsReceived": 890,
+      "totalGiftsReceivedValue": 245000,
+      "streamsHosted": 48,
+      "bio": "Live acoustic guitar sessions, African pop & song requests 🎸",
+      "isBanned": false,
+      "isVerifiedStreamer": true,
+      "joinedAt": 1786473839952,
+      "passwordHash": "56e807d1d3ac2ba7e30937262714a16b9ade5fe6341fe3e370a311230163b683"
+    },
+    "ProGamer_Kai": {
+      "username": "ProGamer_Kai",
+      "role": "streamer",
+      "level": 18,
+      "xp": 16200,
+      "coins": 18400,
+      "diamonds": 52000,
+      "avatarSeed": "ProGamer_Kai",
+      "followers": [
+        "Aria_Acoustic",
+        "CyberNova"
+      ],
+      "following": [
+        "Aria_Acoustic"
+      ],
+      "totalGiftsSent": 90,
+      "totalGiftsValue": 35000,
+      "totalGiftsReceived": 1420,
+      "totalGiftsReceivedValue": 380000,
+      "streamsHosted": 92,
+      "bio": "Top ranked mobile esports fighter & PK Arena Champion 🏆",
+      "isBanned": false,
+      "isVerifiedStreamer": true,
+      "joinedAt": 1786041839952
+    },
+    "ElenaDance": {
+      "username": "ElenaDance",
+      "role": "streamer",
+      "level": 16,
+      "xp": 12800,
+      "coins": 15200,
+      "diamonds": 29000,
+      "avatarSeed": "ElenaDance",
+      "followers": [
+        "StarlightAlex"
+      ],
+      "following": [],
+      "totalGiftsSent": 60,
+      "totalGiftsValue": 18000,
+      "totalGiftsReceived": 620,
+      "totalGiftsReceivedValue": 195000,
+      "streamsHosted": 64,
+      "bio": "Afrobeats choreography, dance battles & studio sessions 💃",
+      "isBanned": false,
+      "isVerifiedStreamer": true,
+      "joinedAt": 1786905839952
+    },
+    "CyberNova": {
+      "username": "CyberNova",
+      "role": "vip",
+      "level": 10,
+      "xp": 5000,
+      "coins": 45000,
+      "diamonds": 4500,
+      "avatarSeed": "CyberNova",
+      "followers": [],
+      "following": [
+        "Aria_Acoustic",
+        "ProGamer_Kai"
+      ],
+      "totalGiftsSent": 420,
+      "totalGiftsValue": 185000,
+      "totalGiftsReceived": 12,
+      "totalGiftsReceivedValue": 2400,
+      "streamsHosted": 2,
+      "bio": "VIP Top Gifting Enthusiast & Supporter 💎",
+      "isBanned": false,
+      "isVerifiedStreamer": false,
+      "joinedAt": 1787337839952
+    },
+    "StarlightAlex": {
+      "username": "StarlightAlex",
+      "role": "vip",
+      "level": 12,
+      "xp": 7200,
+      "coins": 68000,
+      "diamonds": 6200,
+      "avatarSeed": "StarlightAlex",
+      "followers": [],
+      "following": [
+        "Aria_Acoustic",
+        "ElenaDance"
+      ],
+      "totalGiftsSent": 580,
+      "totalGiftsValue": 240000,
+      "totalGiftsReceived": 25,
+      "totalGiftsReceivedValue": 5000,
+      "streamsHosted": 4,
+      "bio": "Top Leaderboard Gifter ✨ Support creative African talent!",
+      "isBanned": false,
+      "isVerifiedStreamer": false,
+      "joinedAt": 1787165039952
+    },
+    "Mod_Sentinel": {
+      "username": "Mod_Sentinel",
+      "role": "user",
+      "level": 1,
+      "xp": 0,
+      "coins": 1000,
+      "diamonds": 0,
+      "avatarSeed": "Mod_Sentinel",
+      "followers": [],
+      "following": [],
+      "totalGiftsSent": 0,
+      "totalGiftsValue": 0,
+      "totalGiftsReceived": 0,
+      "totalGiftsReceivedValue": 0,
+      "streamsHosted": 0,
+      "bio": "",
+      "isBanned": false,
+      "isVerifiedStreamer": false,
+      "joinedAt": 1788201895020
+    },
+    "NeonRider903": {
+      "username": "NeonRider903",
+      "role": "user",
+      "level": 1,
+      "xp": 0,
+      "coins": 1000,
+      "diamonds": 0,
+      "avatarSeed": "NeonRider903",
+      "followers": [],
+      "following": [],
+      "totalGiftsSent": 0,
+      "totalGiftsValue": 0,
+      "totalGiftsReceived": 0,
+      "totalGiftsReceivedValue": 0,
+      "streamsHosted": 0,
+      "bio": "",
+      "isBanned": false,
+      "isVerifiedStreamer": false,
+      "joinedAt": 1788201897779
+    },
+    "CongoStar_7027": {
+      "username": "CongoStar_7027",
+      "role": "streamer",
+      "level": 1,
+      "xp": 0,
+      "coins": 1000,
+      "diamonds": 0,
+      "avatarSeed": "CongoStar_7027",
+      "followers": [],
+      "following": [],
+      "totalGiftsSent": 0,
+      "totalGiftsValue": 0,
+      "totalGiftsReceived": 0,
+      "totalGiftsReceivedValue": 0,
+      "streamsHosted": 0,
+      "bio": "Kinshasa Live Rumba & Afropop",
+      "isBanned": false,
+      "isVerifiedStreamer": false,
+      "joinedAt": 1788205857332,
+      "passwordHash": "5605527575cb466f3bc312805ac48e00875a459be78b316afa83dd9ee3e27943"
+    }
+  },
+  "transactions": [
+    {
+      "id": "tx_init1",
+      "username": "CyberNova",
+      "packageId": "pack_32k",
+      "coins": 32000,
+      "amountUsd": 24.99,
+      "amountCdf": 70000,
+      "method": "Vodacom M-Pesa (DRC)",
+      "phone": "+243 819928172",
+      "status": "COMPLETED",
+      "timestamp": 1788198239952
+    },
+    {
+      "id": "tx_init2",
+      "username": "StarlightAlex",
+      "packageId": "pack_70k",
+      "coins": 70000,
+      "amountUsd": 49.99,
+      "amountCdf": 140000,
+      "method": "Airtel Money (DRC)",
+      "phone": "+243 971827361",
+      "status": "COMPLETED",
+      "timestamp": 1788200039952
+    }
+  ],
+  "withdrawals": [
+    {
+      "id": "wd_5hiqokh",
+      "username": "Aria_Acoustic",
+      "diamonds": 5000,
+      "amountUsd": 50,
+      "amountCdf": 140000,
+      "method": "Airtel Money (DRC)",
+      "accountPhone": "+243 97 554 2291",
+      "accountName": "Aria Kabamba",
+      "status": "PAID",
+      "requestedAt": 1788201911295,
+      "processedAt": 1788201917901,
+      "notes": "Paid via Airtel Money bulk API"
+    },
+    {
+      "id": "wd_demo1",
+      "username": "Aria_Acoustic",
+      "diamonds": 10000,
+      "amountUsd": 100,
+      "amountCdf": 280000,
+      "method": "Vodacom M-Pesa (DRC)",
+      "accountPhone": "+243 81 554 2291",
+      "accountName": "Aria Kabamba",
+      "status": "APPROVED",
+      "requestedAt": 1788194639952,
+      "processedAt": 1788198239952,
+      "notes": "Approved via automated M-Pesa payout API"
+    },
+    {
+      "id": "wd_demo2",
+      "username": "ProGamer_Kai",
+      "diamonds": 15000,
+      "amountUsd": 150,
+      "amountCdf": 420000,
+      "method": "Airtel Money (DRC)",
+      "accountPhone": "+243 97 882 1044",
+      "accountName": "Kai Mukendi",
+      "status": "PENDING",
+      "requestedAt": 1788200039952,
+      "processedAt": null,
+      "notes": "Awaiting admin queue review"
+    }
+  ],
+  "replays": [
+    {
+      "id": "vod_1",
+      "title": "🎸 Midnight Acoustic Live & Kinshasa Rumba",
+      "hostUsername": "Aria_Acoustic",
+      "category": "Music",
+      "tags": [
+        "Acoustic",
+        "Guitar",
+        "LiveSession"
+      ],
+      "durationSeconds": 3840,
+      "viewCount": 4280,
+      "likes": 14500,
+      "diamondsEarned": 8400,
+      "recordedAt": 1788115439952,
+      "thumbnailIcon": "🎸",
+      "videoUrl": "sample_vod_1.mp4"
+    },
+    {
+      "id": "vod_2",
+      "title": "⚔️ PK Arena Grand Final 5-Round Showdown",
+      "hostUsername": "ProGamer_Kai",
+      "category": "Gaming",
+      "tags": [
+        "PKArena",
+        "Battle",
+        "Tournament"
+      ],
+      "durationSeconds": 4520,
+      "viewCount": 6890,
+      "likes": 28400,
+      "diamondsEarned": 18200,
+      "recordedAt": 1788029039953,
+      "thumbnailIcon": "🏆",
+      "videoUrl": "sample_vod_2.mp4"
+    },
+    {
+      "id": "vod_3",
+      "title": "💃 Afro-Choreography Masterclass & Live Q&A",
+      "hostUsername": "ElenaDance",
+      "category": "Dance",
+      "tags": [
+        "AfroDance",
+        "Choreography",
+        "Kinshasa"
+      ],
+      "durationSeconds": 2940,
+      "viewCount": 3120,
+      "likes": 9800,
+      "diamondsEarned": 5600,
+      "recordedAt": 1787942639953,
+      "thumbnailIcon": "💃",
+      "videoUrl": "sample_vod_3.mp4"
+    }
+  ],
+  "rules": {
+    "minLevelToGoLive": 1,
+    "maxStreamDurationMinutes": 240,
+    "chatSlowModeSeconds": 0,
+    "autoModEnabled": true,
+    "bannedWords": [
+      "scam",
+      "cheat",
+      "hack",
+      "hate",
+      "abuse",
+      "phishing"
+    ],
+    "giftCommissionRatePct": 15,
+    "defaultPkDurationSeconds": 180,
+    "diamondToUsdRate": 0.01,
+    "minWithdrawalDiamonds": 1000,
+    "maintenanceMode": false,
+    "allowGuestSeats": true
+  },
+  "auditLogs": [
+    {
+      "id": "log-1",
+      "timestamp": 1788198239953,
+      "category": "System",
+      "action": "SERVER_BOOT",
+      "details": "Persistent Database & WebRTC SFU engine online",
+      "actor": "System"
+    },
+    {
+      "id": "log-2",
+      "timestamp": 1788200039953,
+      "category": "Role",
+      "action": "ROLE_ASSIGNED",
+      "details": "Granted [admin] role to Admin_Master",
+      "actor": "System"
+    },
+    {
+      "id": "log-3",
+      "timestamp": 1788200939953,
+      "category": "Economy",
+      "action": "PAYOUT_APPROVED",
+      "details": "Approved $100.00 M-Pesa payout to @Aria_Acoustic",
+      "actor": "Admin_Master"
+    }
+  ]
+}

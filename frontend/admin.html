@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#060812" />
+  <title>LiveWave — Enterprise Admin Command Center</title>
+
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Socket.IO Client -->
+  <script src="/socket.io/socket.io.js"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+  <!-- Ambient Glowing Orbs Background -->
+  <div class="admin-bg-orbs" aria-hidden="true">
+    <div class="admin-orb admin-orb-1"></div>
+    <div class="admin-orb admin-orb-2"></div>
+  </div>
+
+  <!-- Toast Notifications Container -->
+  <div class="admin-toast-container" id="adminToastContainer"></div>
+
+  <div class="admin-layout">
+    
+    <!-- ══════════════════════════════════════════════════
+         SIDEBAR NAVIGATION
+         ══════════════════════════════════════════════════ -->
+    <aside class="admin-sidebar">
+      <a href="/admin" class="admin-brand">
+        <span>🌊 LiveWave</span>
+        <span class="admin-brand-badge">ENTERPRISE</span>
+      </a>
+
+      <div class="sidebar-section-lbl">Management Modules</div>
+      <nav class="sidebar-nav">
+        <button class="nav-item-btn active" data-tab="overview">
+          <span class="nav-icon">📊</span>
+          <span>Overview & Analytics</span>
+        </button>
+
+        <button class="nav-item-btn" data-tab="surveillance">
+          <span class="nav-icon">📡</span>
+          <span>Live Surveillance</span>
+        </button>
+
+        <button class="nav-item-btn" data-tab="users">
+          <span class="nav-icon">👥</span>
+          <span>Users & Roles</span>
+        </button>
+
+        <button class="nav-item-btn" data-tab="chat">
+          <span class="nav-icon">💬</span>
+          <span>Live Chat Monitor</span>
+        </button>
+
+        <button class="nav-item-btn" data-tab="gifts">
+          <span class="nav-icon">🎁</span>
+          <span>Gift Studio</span>
+        </button>
+
+        <button class="nav-item-btn" data-tab="sfu">
+          <span class="nav-icon">⚡</span>
+          <span>SFU WebRTC Telemetry</span>
+        </button>
+
+        <button class="nav-item-btn" data-tab="payouts">
+          <span class="nav-icon">💸</span>
+          <span>Creator Payouts</span>
+        </button>
+
+        <button class="nav-item-btn" data-tab="rules">
+          <span class="nav-icon">⚙️</span>
+          <span>Rules & Policies</span>
+        </button>
+
+        <button class="nav-item-btn" data-tab="logs">
+          <span class="nav-icon">📜</span>
+          <span>Audit Logs</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-section-lbl" style="margin-top:12px;">Quick Actions</div>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <button class="btn-admin btn-admin-primary" style="font-size:0.8rem; padding:8px 12px;" onclick="window.adminCtrl.spawnSimulatedStream()">
+          <span>⚡ Spawn Test Stream</span>
+        </button>
+        <button class="btn-admin btn-admin-ghost" style="font-size:0.8rem; padding:8px 12px; color:var(--cyan);" onclick="window.adminCtrl.openBroadcastModal()">
+          <span>📢 Global Alert</span>
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <a href="/index.html" class="btn-sidebar-link">
+          <span>🎬 Live App Lobby</span>
+        </a>
+        <a href="/landing.html" class="btn-sidebar-link">
+          <span>✨ Product Showcase</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- ══════════════════════════════════════════════════
+         MAIN CONTENT AREA
+         ══════════════════════════════════════════════════ -->
+    <main class="admin-main">
+      
+      <!-- Top Control Bar -->
+      <header class="admin-header">
+        <div class="header-title-wrap">
+          <h1 id="adminViewTitle">📊 Platform Overview & Real-Time Analytics</h1>
+        </div>
+
+        <div class="header-actions-group">
+          <div class="status-chip">
+            <span class="user-status-dot status-online"></span>
+            <span>SFU WebRTC: OPERATIONAL</span>
+          </div>
+          <div class="admin-clock" id="adminClock">00:00:00</div>
+        </div>
+      </header>
+
+      <div class="admin-content-scroll">
+        
+        <!-- ─── TAB 1: OVERVIEW & ANALYTICS ─── -->
+        <div class="tab-panel active" id="tab-overview">
+          
+          <!-- KPI Metrics Row -->
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-icon-box kpi-icon-purple">📡</div>
+              <div class="kpi-details">
+                <span class="kpi-val" id="kpiActiveStreams">0</span>
+                <span class="kpi-lbl">Active Live Streams</span>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-icon-box kpi-icon-green">👥</div>
+              <div class="kpi-details">
+                <span class="kpi-val" id="kpiOnlineUsers">0</span>
+                <span class="kpi-lbl">Online Sockets</span>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-icon-box kpi-icon-gold">🪙</div>
+              <div class="kpi-details">
+                <span class="kpi-val" id="kpiTotalCoins">0</span>
+                <span class="kpi-lbl">Coins in Circulation</span>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-icon-box kpi-icon-cyan">⚡</div>
+              <div class="kpi-details">
+                <span class="kpi-val" style="font-size:1.4rem;" id="kpiSysUptime">--</span>
+                <span class="kpi-lbl">Server Uptime & RAM</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category Breakdown & Traffic Visualizer -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3>📈 Stream Category Distribution & Traffic</h3>
+              <button class="btn-admin btn-admin-primary" onclick="window.adminCtrl.spawnSimulatedStream()">⚡ Add Test Stream</button>
+            </div>
+            
+            <div style="display:flex; flex-direction:column; gap:14px;" id="analyticsCategoryBars">
+              <!-- Dynamically rendered category bars -->
+            </div>
+          </div>
+
+          <!-- Quick Activity Panel -->
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3>📜 Recent Platform Audit Stream</h3>
+              <button class="btn-admin btn-admin-ghost" onclick="document.querySelector('[data-tab=logs]').click()">View All Logs →</button>
+            </div>
+            <div class="audit-log-list" style="max-height: 240px;" id="overviewLogsList">
+              <!-- Logs populated dynamically -->
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ─── TAB 2: LIVE SURVEILLANCE ─── -->
+        <div class="tab-panel" id="tab-surveillance">
+          <div class="panel-card">
+            <div class="panel-header">
+              <div>
+                <h3>📡 Active Live Stream Surveillance Matrix</h3>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">Real-time feed surveillance, viewer counts, PK duel state, and emergency termination controls.</p>
+              </div>
+              <div style="display:flex; gap:10px;">
+                <button class="btn-admin btn-admin-primary" onclick="window.adminCtrl.spawnSimulatedStream()">⚡ Spawn Test Stream</button>
+                <button class="btn-admin btn-admin-ghost" onclick="fetchOverview()">🔄 Refresh Grid</button>
+              </div>
+            </div>
+
+            <div class="surveillance-grid" id="surveillanceGrid">
+              <!-- Dynamically populated -->
+            </div>
+
+            <div class="empty-state-box" id="surveillanceEmptyState" style="display:none; text-align:center; padding:50px 20px; color:var(--text-muted);">
+              <div style="font-size:3.5rem; margin-bottom:12px;">📡</div>
+              <h4>No Broadcasts Currently Live</h4>
+              <p style="font-size:0.9rem; margin-top:4px; margin-bottom:16px;">Click the button below to spawn a simulated live stream to test the surveillance engine.</p>
+              <button class="btn-admin btn-admin-primary" onclick="window.adminCtrl.spawnSimulatedStream()">⚡ Spawn Simulated Broadcast</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── TAB 3: USER DIRECTORY & ROLES ─── -->
+        <div class="tab-panel" id="tab-users">
+          <div class="panel-card">
+            <div class="panel-header">
+              <div>
+                <h3>👥 User Accounts & Role Distribution</h3>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">Manage platform role hierarchy, coin balances, creator status, and moderation bans.</p>
+              </div>
+              <div class="panel-actions">
+                <input type="text" class="search-input-admin" id="userSearchInput" placeholder="Search by username or bio…" />
+                <select class="filter-select-admin" id="userRoleFilter">
+                  <option value="all">All Roles</option>
+                  <option value="admin">Admins (🛡️)</option>
+                  <option value="moderator">Moderators (⚔️)</option>
+                  <option value="streamer">Streamers (🎙️)</option>
+                  <option value="vip">VIPs (💎)</option>
+                  <option value="user">Standard Users (👤)</option>
+                  <option value="banned">⛔ Banned Users</option>
+                </select>
+                <button class="btn-admin btn-admin-primary" onclick="fetchUsers()">🔄 Refresh</button>
+              </div>
+            </div>
+
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Level</th>
+                    <th>Coins</th>
+                    <th>Streams</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── TAB 4: GLOBAL CHAT MONITOR ─── -->
+        <div class="tab-panel" id="tab-chat">
+          <div class="panel-card">
+            <div class="panel-header">
+              <div>
+                <h3>💬 Global Live Chat Stream & Interceptor</h3>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">Real-time feed of all chat messages across all active rooms with instant moderation tools.</p>
+              </div>
+              <button class="btn-admin btn-admin-ghost" onclick="fetchChatMessages()">🔄 Refresh Messages</button>
+            </div>
+
+            <div class="chat-monitor-list" id="chatMonitorList">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── TAB 5: GIFT CATALOG & ECONOMY STUDIO ─── -->
+        <div class="tab-panel" id="tab-gifts">
+          <div class="panel-card">
+            <div class="panel-header">
+              <div>
+                <h3>🎁 Virtual Gift Catalog & Economy Studio</h3>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">Customize coin pricing, animation tiers, combo multipliers, or introduce brand new virtual gifts.</p>
+              </div>
+              <button class="btn-admin btn-admin-primary" onclick="window.adminCtrl.openAddGiftModal()">➕ Add New Gift</button>
+            </div>
+
+            <div class="gift-studio-grid" id="giftStudioGrid">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── TAB 6: WEBRTC SFU TELEMETRY ─── -->
+        <div class="tab-panel" id="tab-sfu">
+          <div class="panel-card">
+            <div class="panel-header">
+              <div>
+                <h3>⚡ Mediasoup WebRTC SFU Telemetry</h3>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">C++ SFU worker diagnostics, active RTP codecs, transport pipelines, and latency telemetry.</p>
+              </div>
+              <button class="btn-admin btn-admin-primary" onclick="fetchSfuTelemetry()">🔄 Refresh Diagnostics</button>
+            </div>
+
+            <div class="sfu-specs-grid" id="sfuDiagnosticsGrid">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── TAB: CREATOR PAYOUT QUEUE ─── -->
+        <div class="tab-panel" id="tab-payouts">
+          <div class="panel-card">
+            <div class="panel-header">
+              <div>
+                <h3>💸 Creator Diamond Payout & Withdrawal Queue</h3>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">Review, approve, mark paid, or reject creator cashouts to Vodacom M-Pesa, Airtel Money, Orange Money, Afrimoney, and Bank Wire.</p>
+              </div>
+              <button class="btn-admin btn-admin-primary" onclick="window.adminCtrl.fetchWithdrawals()">🔄 Refresh Payouts</button>
+            </div>
+
+            <div class="table-container">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Payout ID</th>
+                    <th>Creator</th>
+                    <th>Diamonds</th>
+                    <th>Amount (USD)</th>
+                    <th>Amount (CDF)</th>
+                    <th>Method / Carrier</th>
+                    <th>Destination Phone / Account</th>
+                    <th>Status</th>
+                    <th>Requested</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="payoutsTableBody">
+                  <!-- Dynamically populated via admin.js -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── TAB 7: RULES & POLICY ENGINE ─── -->
+        <div class="tab-panel" id="tab-rules">
+          <div class="panel-card">
+            <div class="panel-header">
+              <div>
+                <h3>⚙️ Platform Rules & Automated Policy Engine</h3>
+                <p style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">Configure global streaming requirements, auto-mod filters, gift commissions, and battle settings in real-time.</p>
+              </div>
+              <button class="btn-admin btn-admin-primary" id="btnSaveRules" style="padding:10px 24px; font-size:0.95rem;">💾 Save Platform Rules</button>
+            </div>
+
+            <div class="rules-form-grid">
+              
+              <!-- Rule Group 1: Broadcaster Requirements -->
+              <div class="rule-group-card">
+                <h4>🎙️ Broadcast & Stream Policies</h4>
+                
+                <div class="rule-item">
+                  <div class="rule-info">
+                    <span class="rule-title">Minimum Level to Go Live</span>
+                    <span class="rule-desc">Prevents new bot accounts from streaming immediately.</span>
+                  </div>
+                  <input type="number" class="rule-input" id="ruleMinLevel" min="1" max="99" value="1" />
+                </div>
+
+                <div class="rule-item">
+                  <div class="rule-info">
+                    <span class="rule-title">Max Stream Duration (Minutes)</span>
+                    <span class="rule-desc">Automatic timeout for unattended streams.</span>
+                  </div>
+                  <input type="number" class="rule-input" id="ruleMaxDuration" min="30" max="1440" value="240" />
+                </div>
+
+                <div class="rule-item">
+                  <div class="rule-info">
+                    <span class="rule-title">Allow Multi-Guest Video Seats</span>
+                    <span class="rule-desc">Permit 4-seat and 9-seat co-hosting grids.</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="ruleGuestSeats" checked />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Rule Group 2: Content Auto-Mod -->
+              <div class="rule-group-card">
+                <h4>🛡️ Automated Content Moderation (Auto-Mod)</h4>
+
+                <div class="rule-item">
+                  <div class="rule-info">
+                    <span class="rule-title">Enable Auto-Mod Keyword Masking</span>
+                    <span class="rule-desc">Automatically replaces blacklisted terms with asterisks.</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="ruleAutoMod" checked />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+
+                <div class="rule-item">
+                  <div class="rule-info">
+                    <span class="rule-title">Chat Slow Mode (Seconds)</span>
+                    <span class="rule-desc">Cooldown delay required between consecutive messages.</span>
+                  </div>
+                  <input type="number" class="rule-input" id="ruleChatSlowMode" min="0" max="60" value="0" />
+                </div>
+
+                <div>
+                  <label class="rule-title" style="display:block; margin-bottom:6px;">Restricted Keywords (Comma Separated)</label>
+                  <textarea class="tags-textarea" id="ruleBannedWords" placeholder="scam, hack, hate, abuse…"></textarea>
+                </div>
+              </div>
+
+              <!-- Rule Group 3: Virtual Economy & Gifts -->
+              <div class="rule-group-card">
+                <h4>🪙 Virtual Economy & Commission</h4>
+
+                <div class="rule-item">
+                  <div class="rule-info">
+                    <span class="rule-title">Platform Gift Commission (%)</span>
+                    <span class="rule-desc">Platform fee deducted from virtual gifts sent to creators.</span>
+                  </div>
+                  <input type="number" class="rule-input" id="ruleGiftTax" min="0" max="50" value="15" />
+                </div>
+
+                <div class="rule-item">
+                  <div class="rule-info">
+                    <span class="rule-title">Default PK Duel Duration (Sec)</span>
+                    <span class="rule-desc">Standard length of streamer head-to-head battles.</span>
+                  </div>
+                  <input type="number" class="rule-input" id="rulePkDuration" min="60" max="900" value="180" />
+                </div>
+              </div>
+
+              <!-- Rule Group 4: Global System Controls -->
+              <div class="rule-group-card">
+                <h4>🚨 Platform Maintenance & Lock</h4>
+
+                <div class="rule-item">
+                  <div class="rule-info">
+                    <span class="rule-title">Maintenance Mode</span>
+                    <span class="rule-desc">Disallows starting new live broadcasts (Admin access only).</span>
+                  </div>
+                  <label class="toggle-switch">
+                    <input type="checkbox" id="ruleMaintenance" />
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── TAB 8: AUDIT LOGS ─── -->
+        <div class="tab-panel" id="tab-logs">
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3>📜 Real-Time Platform Audit & Event Stream</h3>
+              <button class="btn-admin btn-admin-primary" onclick="fetchOverview()">🔄 Refresh Logs</button>
+            </div>
+            <div class="audit-log-list" id="auditLogList">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL 1: ROLE DISTRIBUTION
+       ══════════════════════════════════════════════════ -->
+  <div class="admin-modal-overlay hidden" id="modalAdminRole">
+    <div class="admin-modal-card">
+      <div class="modal-header-admin">
+        <h3>Assign User Role</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('modalAdminRole').classList.add('hidden')">✕</button>
+      </div>
+      <div class="modal-body-admin">
+        <p>Assigning role for user: <strong id="roleModalUsername" style="color:var(--primary);">@User</strong></p>
+        
+        <label style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">Select Role</label>
+        <select class="filter-select-admin" id="roleModalSelect" style="width:100%;">
+          <option value="admin">🛡️ Admin (Full Control)</option>
+          <option value="moderator">⚔️ Moderator (Chat & Bans)</option>
+          <option value="streamer">🎙️ Verified Streamer (Priority Feed)</option>
+          <option value="vip">💎 VIP Member (Gold Badges & Marquees)</option>
+          <option value="user">👤 Standard User</option>
+        </select>
+      </div>
+      <div class="modal-actions-admin">
+        <button class="btn-admin btn-admin-ghost" onclick="document.getElementById('modalAdminRole').classList.add('hidden')">Cancel</button>
+        <button class="btn-admin btn-admin-primary" onclick="window.adminCtrl.submitRoleChange()">Update Role</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL 2: ADJUST COINS
+       ══════════════════════════════════════════════════ -->
+  <div class="admin-modal-overlay hidden" id="modalAdminCoins">
+    <div class="admin-modal-card">
+      <div class="modal-header-admin">
+        <h3>Adjust Coin Balance</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('modalAdminCoins').classList.add('hidden')">✕</button>
+      </div>
+      <div class="modal-body-admin">
+        <p>Adjusting coins for: <strong id="coinModalUsername" style="color:var(--gold);">@User</strong></p>
+        <p style="font-size:0.85rem; color:var(--text-muted);">Current Balance: <strong id="coinModalCurrent">0</strong> Coins</p>
+
+        <label style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">Action</label>
+        <select class="filter-select-admin" id="coinModalAction" style="width:100%;">
+          <option value="add">➕ Add Coins</option>
+          <option value="deduct">➖ Deduct Coins</option>
+          <option value="set">🎯 Set Exact Balance</option>
+        </select>
+
+        <label style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">Amount</label>
+        <input type="number" class="search-input-admin" id="coinModalAmount" style="width:100%; text-align:left;" value="500" />
+      </div>
+      <div class="modal-actions-admin">
+        <button class="btn-admin btn-admin-ghost" onclick="document.getElementById('modalAdminCoins').classList.add('hidden')">Cancel</button>
+        <button class="btn-admin btn-admin-primary" onclick="window.adminCtrl.submitCoinAdjustment()">Apply Adjustment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL 3: ADD NEW GIFT
+       ══════════════════════════════════════════════════ -->
+  <div class="admin-modal-overlay hidden" id="modalAdminAddGift">
+    <div class="admin-modal-card">
+      <div class="modal-header-admin">
+        <h3>➕ Add Custom Virtual Gift</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('modalAdminAddGift').classList.add('hidden')">✕</button>
+      </div>
+      <div class="modal-body-admin">
+        <label style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">Gift Name</label>
+        <input type="text" class="search-input-admin" id="newGiftName" placeholder="e.g. Phoenix Wings" style="width:100%;" />
+
+        <label style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">Emoji / Icon</label>
+        <input type="text" class="search-input-admin" id="newGiftIcon" placeholder="e.g. 🦅 or ⚡" style="width:100%;" />
+
+        <label style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">Coin Price</label>
+        <input type="number" class="search-input-admin" id="newGiftPrice" value="250" style="width:100%;" />
+
+        <label style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">Tier Level</label>
+        <select class="filter-select-admin" id="newGiftTier" style="width:100%;">
+          <option value="small">Small (Standard)</option>
+          <option value="medium" selected>Medium (Glow)</option>
+          <option value="large">Large (Full Screen)</option>
+          <option value="mega">Mega VIP (Marquee)</option>
+        </select>
+      </div>
+      <div class="modal-actions-admin">
+        <button class="btn-admin btn-admin-ghost" onclick="document.getElementById('modalAdminAddGift').classList.add('hidden')">Cancel</button>
+        <button class="btn-admin btn-admin-primary" onclick="window.adminCtrl.submitAddGift()">Create Gift</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL 4: TERMINATE STREAM CONFIRMATION
+       ══════════════════════════════════════════════════ -->
+  <div class="admin-modal-overlay hidden" id="modalAdminTerminate">
+    <div class="admin-modal-card">
+      <div class="modal-header-admin">
+        <h3 style="color:var(--danger);">⚠️ Force Terminate Stream</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('modalAdminTerminate').classList.add('hidden')">✕</button>
+      </div>
+      <div class="modal-body-admin">
+        <p>Are you sure you want to forcibly terminate broadcast:</p>
+        <strong id="terminateModalTitle" style="color:#fff;">Stream Title</strong>
+        <input type="hidden" id="terminateModalRoomId" />
+
+        <label style="font-size:0.85rem; font-weight:700; color:var(--text-muted); margin-top:8px;">Reason</label>
+        <input type="text" class="search-input-admin" id="terminateModalReason" style="width:100%; text-align:left;" value="Violation of platform guidelines" />
+      </div>
+      <div class="modal-actions-admin">
+        <button class="btn-admin btn-admin-ghost" onclick="document.getElementById('modalAdminTerminate').classList.add('hidden')">Cancel</button>
+        <button class="btn-admin btn-admin-danger" onclick="window.adminCtrl.submitTerminateStream()">Terminate Immediately</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL 5: GLOBAL SYSTEM BROADCAST
+       ══════════════════════════════════════════════════ -->
+  <div class="admin-modal-overlay hidden" id="modalAdminBroadcast">
+    <div class="admin-modal-card">
+      <div class="modal-header-admin">
+        <h3>📢 Dispatch Global System Alert</h3>
+        <button class="modal-close-btn" onclick="document.getElementById('modalAdminBroadcast').classList.add('hidden')">✕</button>
+      </div>
+      <div class="modal-body-admin">
+        <p style="font-size:0.85rem; color:var(--text-muted);">This message will instantly broadcast across all connected clients and active live streams.</p>
+
+        <label style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">Alert Severity</label>
+        <select class="filter-select-admin" id="broadcastSeveritySelect" style="width:100%;">
+          <option value="info">ℹ️ Info Banner (Cyan)</option>
+          <option value="warn">⚠️ Warning Announcement (Gold)</option>
+          <option value="urgent">🚨 Urgent / Maintenance (Red)</option>
+        </select>
+
+        <label style="font-size:0.85rem; font-weight:700; color:var(--text-muted);">Message</label>
+        <textarea class="tags-textarea" id="broadcastMessageInput" placeholder="Type platform announcement here…"></textarea>
+      </div>
+      <div class="modal-actions-admin">
+        <button class="btn-admin btn-admin-ghost" onclick="document.getElementById('modalAdminBroadcast').classList.add('hidden')">Cancel</button>
+        <button class="btn-admin btn-admin-primary" onclick="window.adminCtrl.submitBroadcast()">Broadcast Alert</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Controller Script -->
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  livewave:
+    build: .
+    container_name: livewave-stream-sfu
+    restart: always
+    network_mode: "host" # Crucial for WebRTC UDP performance
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - MEDIASOUP_ANNOUNCED_IP=${PUBLIC_IP:-127.0.0.1}
+    volumes:
+      - ./backend/data:/app/backend/data

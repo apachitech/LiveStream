@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0d18" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>LiveWave — Next-Gen Live Streaming & Social Entertainment</title>
+  <meta name="description" content="LiveWave — Real-time zero-latency live streaming with PK battles, virtual gifts, multi-guest seats, and vibrant social community." />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Ambient Glowing Orbs Background -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       GLOBAL APP HEADER
+       ══════════════════════════════════════════════════ -->
+  <header class="app-header" id="appHeader">
+    <div class="header-left">
+      <button class="logo-btn" id="logoBtn" title="Back to Lobby">
+        <span class="logo-dot"></span>
+        <span class="logo-text">Live<span class="gradient-text">Wave</span></span>
+      </button>
+
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="globalSearchInput" placeholder="Search streamers, tags, categories…" aria-label="Search streams" />
+        <kbd class="search-kbd" title="Press '/' to search">/</kbd>
+      </div>
+    </div>
+
+    <div class="header-right">
+      <!-- PWA Install Prompt Button -->
+      <button class="btn btn-ghost btn-sm hidden" id="btnInstallPwa" style="color:var(--cyan); border-color:rgba(6,214,230,0.3);" title="Install LiveWave App on your device">
+        📲 Install App
+      </button>
+
+      <!-- Audio Mute Toggle -->
+      <button class="header-icon-btn" id="soundToggleBtn" title="Toggle Sound FX" aria-label="Toggle Sound FX">
+        <span id="soundIcon">🔊</span>
+      </button>
+
+      <!-- Wallet Chip -->
+      <div class="wallet-chip" id="walletChip" title="Click to view wallet / get free coins">
+        <span class="coin-icon">🪙</span>
+        <span class="coin-amount" id="userCoins">1,000</span>
+        <button class="btn-coin-add" id="openWalletBtn" aria-label="Get Coins">+</button>
+      </div>
+
+      <!-- About / Landing Tour Link -->
+      <a href="/landing.html" class="btn btn-ghost btn-sm" style="text-decoration:none; padding:6px 14px; font-size:0.82rem;" title="View LiveWave Showcase & Features">✨ Tour</a>
+
+      <!-- Admin Control Center Link -->
+      <a href="/admin" class="btn btn-ghost btn-sm" style="text-decoration:none; padding:6px 12px; font-size:0.82rem; color:#d8b4fe;" title="Open Admin Command Center">🛡️ Admin</a>
+
+      <!-- Go Live Primary Action -->
+      <button class="btn btn-primary btn-golive" id="headerGoLiveBtn">
+        <span class="pulse-red-dot"></span>
+        <span>Go Live</span>
+      </button>
+
+      <!-- Log In / Switch Account Button -->
+      <button class="btn btn-ghost btn-sm" id="headerAuthBtn" style="font-size:0.82rem; color:var(--cyan); border-color:rgba(6,214,230,0.35); padding:6px 12px;" title="Sign In / Switch User Account">
+        🔑 Log In
+      </button>
+
+      <!-- User Profile Avatar Chip -->
+      <button class="profile-chip" id="profileChip" title="View Profile">
+        <div class="user-avatar-small" id="headerAvatar">👤</div>
+        <div class="user-info-text">
+          <span class="user-name-header" id="headerUsername">Guest</span>
+          <span class="level-badge" id="headerLevel">Lv.1</span>
+        </div>
+      </button>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════
+       PAGE 1: LOBBY & DISCOVERY FEED
+       ══════════════════════════════════════════════════ -->
+  <div id="page-lobby" class="page active">
+    <main class="lobby-container">
+      
+      <!-- Hero Discovery Banner -->
+      <section class="lobby-hero">
+        <div class="hero-content">
+          <div class="hero-tag">🔥 REAL-TIME STREAMING · ZERO LATENCY · PK BATTLES</div>
+          <h1 class="hero-heading">Where Live Moments <br/><span class="gradient-text">Become Legends.</span></h1>
+          <p class="hero-description">Watch world-class creators, support your favorites with spectacular 3D gifts, or step into the spotlight and start your own broadcast.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary btn-lg pulse-glow" id="heroStartLiveBtn">🎙️ Start Broadcasting</button>
+            <button class="btn btn-gold btn-lg" id="heroDemoBtn" title="Launch instant interactive demo stream">⚡ Instant Demo</button>
+            <a href="/admin" class="btn btn-ghost btn-lg" style="text-decoration:none; color:#d8b4fe; border-color:rgba(168,85,247,0.4);" title="Open Admin Command Center">🛡️ Admin Center</a>
+            <button class="btn btn-ghost btn-lg" id="heroExploreBtn">👀 Explore Streams</button>
+          </div>
+        </div>
+        <div class="hero-stats-card glass-panel">
+          <div class="stat-item">
+            <span class="stat-val" id="statLiveCount">0</span>
+            <span class="stat-lbl">Live Now</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-val" id="statViewerCount">0</span>
+            <span class="stat-lbl">Active Viewers</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-val gradient-text-cyan">&lt;120ms</span>
+            <span class="stat-lbl">SFU Latency</span>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-item">
+            <span class="stat-val">100%</span>
+            <span class="stat-lbl">WebRTC SFU</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Categories Filter Tabs -->
+      <nav class="category-nav" aria-label="Stream Categories">
+        <button class="cat-pill active" data-cat="all">✨ All Streams</button>
+        <button class="cat-pill" data-cat="Music">🎵 Music</button>
+        <button class="cat-pill" data-cat="Gaming">🎮 Gaming</button>
+        <button class="cat-pill" data-cat="Chat">💬 Chat & IRL</button>
+        <button class="cat-pill" data-cat="Dance">💃 Dance</button>
+        <button class="cat-pill" data-cat="Talent">🌟 Talent</button>
+        <button class="cat-pill" data-cat="Educational">📚 Educational</button>
+        <button class="cat-pill" data-cat="Sports">⚡ Sports</button>
+      </nav>
+
+      <!-- Live Stream Grid -->
+      <section class="streams-section">
+        <div class="section-title-row">
+          <div class="section-title">
+            <h2>Live Broadcasts</h2>
+            <span class="live-indicator-pill"><span class="pulse-red-dot"></span> LIVE</span>
+          </div>
+          <div class="filter-controls">
+            <button class="btn btn-ghost btn-sm" id="refreshRoomsBtn">🔄 Refresh</button>
+          </div>
+        </div>
+
+        <div class="rooms-grid" id="roomsGrid">
+          <!-- Dynamically populated via JS -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state hidden" id="emptyRoomsState">
+          <div class="empty-icon">📡</div>
+          <h3>No streams currently active</h3>
+          <p>Be the star! Start a stream right now and connect with viewers worldwide.</p>
+          <button class="btn btn-primary btn-md" id="emptyStartStreamBtn">🔴 Go Live Now</button>
+        </div>
+      </section>
+
+      <!-- ─── SECTION 2: STREAM REPLAYS & HIGHLIGHTS (VOD) ─── -->
+      <section class="replays-section" id="replaysSection">
+        <div class="section-title-row">
+          <div class="section-title-group">
+            <span class="live-dot" style="background:var(--cyan); box-shadow:0 0 8px var(--cyan);"></span>
+            <h2>📼 Recorded Stream Replays & Highlights</h2>
+          </div>
+          <span class="live-count-badge" id="replaysCountBadge">3 Replays Available</span>
+        </div>
+
+        <div class="replays-grid" id="replaysGrid">
+          <!-- Dynamically populated via JS -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Mobile Bottom App Bar (Visible on mobile screens in lobby) -->
+    <nav class="mobile-bottom-nav" id="mobileBottomNav" aria-label="Mobile Navigation">
+      <button class="mob-nav-btn active" id="mobNavHome" data-cat="all">
+        <span class="mob-nav-icon">🏠</span>
+        <span class="mob-nav-lbl">Discover</span>
+      </button>
+      <button class="mob-nav-btn" id="mobNavTrending" data-cat="Gaming">
+        <span class="mob-nav-icon">🔥</span>
+        <span class="mob-nav-lbl">Trending</span>
+      </button>
+      <button class="mob-nav-btn mob-nav-golive" id="mobNavGoLive" title="Start Live Broadcast">
+        <div class="mob-golive-circle">
+          <span class="mob-golive-icon">🎙️</span>
+        </div>
+        <span class="mob-nav-lbl">Go Live</span>
+      </button>
+      <button class="mob-nav-btn" id="mobNavMusic" data-cat="Music">
+        <span class="mob-nav-icon">🎵</span>
+        <span class="mob-nav-lbl">Music</span>
+      </button>
+      <button class="mob-nav-btn" id="mobNavProfile" title="Profile & Wallet">
+        <span class="mob-nav-icon">👤</span>
+        <span class="mob-nav-lbl">Profile</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       PAGE 2: LIVE STREAM ROOM & PK BATTLE ARENA
+       ══════════════════════════════════════════════════ -->
+  <div id="page-room" class="page">
+    
+    <!-- Top Stream Room Navigation -->
+    <nav class="room-nav glass-panel">
+      <div class="room-nav-left">
+        <button class="btn-back-lobby" id="roomBackBtn" title="Back to Lobby">← Lobby</button>
+        
+        <div class="streamer-profile-header">
+          <div class="streamer-avatar" id="roomHostAvatar">🎙️</div>
+          <div class="streamer-meta">
+            <div class="streamer-title-row">
+              <span class="streamer-name" id="roomHostName">Streamer</span>
+              <span class="level-badge" id="roomHostLevel">Lv.1</span>
+              <button class="btn-follow" id="roomFollowBtn">+ Follow</button>
+            </div>
+            <span class="stream-title-text" id="roomStreamTitle">Live Stream</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center Status Bar (Badges + PK Bar) -->
+      <div class="room-nav-center">
+        <div class="live-pill" id="roomLivePill"><span class="pulse-red-dot"></span> LIVE</div>
+        <div class="room-telemetry-chip" title="WebRTC SFU Ultra-Low Latency Feed"><span class="pulse-dot-green"></span> 120ms · 1080p 60fps</div>
+        <div class="room-metric" id="roomViewerMetric">👥 <span id="roomViewerCount">0</span></div>
+        <div class="room-metric" id="roomLikesMetric">❤️ <span id="roomLikesCount">0</span></div>
+        <div class="room-metric duration-metric" id="roomDuration">⏱️ 00:00</div>
+      </div>
+
+      <!-- Right Actions: Top Supporters & Leave -->
+      <div class="room-nav-right">
+        <div class="top-supporters-bar" id="topSupportersBar" title="Top Gifting Supporters">
+          <!-- Render top 3 supporter avatars -->
+        </div>
+        <button class="btn btn-ghost btn-sm" id="roomShareBtn" title="Share Stream Link">🔗 Share</button>
+        <button class="btn btn-danger btn-sm" id="roomLeaveBtn">✕ Exit</button>
+      </div>
+    </nav>
+
+    <!-- Room Main Grid Body -->
+    <div class="room-body">
+      
+      <!-- ─── VIDEO & ARENA COLUMN ─── -->
+      <section class="video-column">
+        
+        <div class="video-stage glass-panel" id="videoStage">
+
+          <!-- Top VIP Gift Marquee Banner -->
+          <div class="stage-gift-marquee hidden" id="stageGiftMarquee">
+            <span class="marquee-icon" id="marqueeIcon">🎁</span>
+            <div class="marquee-content">
+              <span class="marquee-user" id="marqueeUser">User</span>
+              <span class="marquee-text" id="marqueeText">sent a Luxury Car!</span>
+            </div>
+            <span class="marquee-badge">VIP GIFT</span>
+          </div>
+
+          <!-- Video Stage Floating Action Controls -->
+          <div class="stage-floating-controls">
+            <button class="stage-float-btn active" id="stageDanmakuBtn" title="Toggle Danmaku Bullet Comments">💬</button>
+            <button class="stage-float-btn" id="stagePipBtn" title="Picture-in-Picture Floating Player">📺</button>
+            <button class="stage-float-btn" id="recordClipBtn" title="Capture Highlight Video Clip">⏺️ <span class="rec-badge hidden" id="recBadge">REC</span></button>
+            <button class="stage-float-btn" id="stageFullscreenBtn" title="Toggle Fullscreen">⛶</button>
+          </div>
+
+          <!-- Danmaku Flying Bullet Comments Layer -->
+          <div class="danmaku-container" id="danmakuContainer" aria-hidden="true"></div>
+
+          <!-- Floating Lucky Treasure Chest / Red Packet Widget -->
+          <div class="stage-treasure-chest hidden" id="stageTreasureChest">
+            <div class="chest-box-glow" id="chestBoxGlow">
+              <div class="chest-icon-anim" id="chestIconAnim">🎁</div>
+            </div>
+            <div class="chest-info-pill glass-panel" id="chestInfoPill">
+              <div class="chest-timer" id="chestTimerBadge">⏱️ 00:45</div>
+              <div class="chest-label" id="chestSenderLabel">Lucky Drop by Streamer</div>
+              <div class="chest-amount-tag">🪙 <strong id="chestTotalTag">500</strong> Coins</div>
+              <button class="btn-claim-chest pulse-glow hidden" id="btnClaimChest">✨ GRAB LUCKY COINS!</button>
+              <button class="btn-view-grabbers-btn" id="btnViewChestGrabbers">View Winners</button>
+            </div>
+          </div>
+
+          <!-- Streamer Soundboard Dock Pad -->
+          <div class="soundboard-drawer glass-panel hidden" id="soundboardDrawer">
+            <div class="soundboard-header">
+              <div class="soundboard-title">🎛️ Live Sound FX Pad</div>
+              <button class="soundboard-close-btn" id="closeSoundboardBtn">✕</button>
+            </div>
+            <div class="soundboard-grid">
+              <button class="sfx-tile" data-sfx="airhorn"><span class="sfx-icon">📯</span><span class="sfx-name">Airhorn</span></button>
+              <button class="sfx-tile" data-sfx="applause"><span class="sfx-icon">👏</span><span class="sfx-name">Applause</span></button>
+              <button class="sfx-tile" data-sfx="drumroll"><span class="sfx-icon">🥁</span><span class="sfx-name">Drumroll</span></button>
+              <button class="sfx-tile" data-sfx="sadtrombone"><span class="sfx-icon">🎺</span><span class="sfx-name">Wah Wah</span></button>
+              <button class="sfx-tile" data-sfx="laughtrack"><span class="sfx-icon">😂</span><span class="sfx-name">Laughs</span></button>
+              <button class="sfx-tile" data-sfx="dramaticHit"><span class="sfx-icon">💥</span><span class="sfx-name">Dramatic</span></button>
+              <button class="sfx-tile" data-sfx="laser"><span class="sfx-icon">🛸</span><span class="sfx-name">Laser Zap</span></button>
+              <button class="sfx-tile" data-sfx="wow"><span class="sfx-icon">😲</span><span class="sfx-name">Wow Chime</span></button>
+            </div>
+          </div>
+
+          <!-- Wheel of Fortune Stage Overlay -->
+          <div class="stage-wheel-overlay hidden" id="stageWheelOverlay">
+            <div class="wheel-card glass-panel" id="wheelCard">
+              <div class="wheel-card-header">
+                <h3>🎡 Wheel of Fortune</h3>
+                <button class="modal-close-btn" id="closeWheelBtn">✕</button>
+              </div>
+              <div class="wheel-canvas-wrapper">
+                <div class="wheel-pointer">▼</div>
+                <canvas id="wheelCanvas" width="340" height="340"></canvas>
+              </div>
+              <div class="wheel-actions">
+                <button class="btn btn-primary btn-lg pulse-glow" id="spinWheelBtn">🎯 SPIN THE WHEEL!</button>
+              </div>
+              <div class="wheel-winner-banner hidden" id="wheelWinnerBanner">
+                <span class="wheel-trophy">🎉</span>
+                <strong id="wheelWinnerSector">Sing a Song</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- PK Battle Arena Header (Hidden until PK active) -->
+          <div class="pk-arena-header hidden" id="pkArenaHeader">
+            <div class="pk-team team-blue">
+              <span class="pk-host-name" id="pkLocalHostName">You</span>
+              <span class="pk-score-badge" id="pkLocalScore">0</span>
+            </div>
+
+            <div class="pk-vs-center">
+              <div class="pk-vs-badge">VS</div>
+              <div class="pk-timer" id="pkTimer">05:00</div>
+            </div>
+
+            <div class="pk-team team-red">
+              <span class="pk-score-badge" id="pkOpponentScore">0</span>
+              <span class="pk-host-name" id="pkOpponentHostName">Opponent</span>
+            </div>
+
+            <!-- Real-time Tug of War Bar -->
+            <div class="pk-progress-bar-container">
+              <div class="pk-bar-blue" id="pkBarBlue" style="width: 50%;"></div>
+              <div class="pk-spark" id="pkSpark">⚡</div>
+              <div class="pk-bar-red" id="pkBarRed" style="width: 50%;"></div>
+            </div>
+          </div>
+
+          <!-- Video Feeds Container -->
+          <div class="video-grid single-mode" id="videoGrid">
+            <!-- Local Host Video Feed -->
+            <div class="video-card" id="localVideoCard">
+              <video id="localVideo" autoplay muted playsinline class="video-player" aria-label="Local Camera"></video>
+              <div class="video-overlay-tag host-tag">HOST (You)</div>
+            </div>
+
+            <!-- Remote Host Video Feed -->
+            <div class="video-card hidden" id="remoteVideoCard">
+              <video id="remoteVideo" autoplay playsinline class="video-player" aria-label="Remote Stream"></video>
+              <div class="video-overlay-tag" id="remoteTag">LIVE STREAM</div>
+            </div>
+
+            <!-- PK Opponent Video Feed -->
+            <div class="video-card hidden" id="pkVideoCard">
+              <video id="pkOpponentVideo" autoplay playsinline class="video-player" aria-label="PK Opponent"></video>
+              <div class="video-overlay-tag pk-tag" id="pkOpponentTag">PK CHALLENGER</div>
+            </div>
+
+            <!-- Multi-Guest / Co-Host Video Feed -->
+            <div class="video-card hidden" id="guestVideoCard">
+              <video id="guestVideo" autoplay playsinline class="video-player" aria-label="Co-Host Guest"></video>
+              <div class="video-overlay-tag guest-tag" id="guestTag">GUEST CO-HOST</div>
+              <button class="guest-leave-btn hidden" id="guestLeaveBtn" title="Leave Co-Host Seat">✕</button>
+            </div>
+          </div>
+
+          <!-- Stage Offline / Loading Screen -->
+          <div class="stage-offline" id="stageOffline">
+            <div class="offline-radar">📡</div>
+            <h3>Waiting for broadcast…</h3>
+            <p>The host will be live shortly. Get ready in the chat!</p>
+          </div>
+
+          <!-- PK Battle Celebration Banner (Victory / Defeat) -->
+          <div class="pk-result-overlay hidden" id="pkResultOverlay">
+            <div class="pk-result-card glass-panel" id="pkResultCard">
+              <div class="pk-result-icon" id="pkResultIcon">🏆</div>
+              <h2 id="pkResultTitle">VICTORY!</h2>
+              <p id="pkResultSub">Congratulations to the winning team!</p>
+              <button class="btn btn-primary btn-sm" id="closePkResultBtn">Continue</button>
+            </div>
+          </div>
+
+          <!-- Interactive Reaction Burst Layer -->
+          <div class="reaction-burst-container" id="reactionBurst" aria-hidden="true"></div>
+
+          <!-- Fullscreen Spectacular Gift FX Layer -->
+          <div class="gift-fx-layer" id="giftFxLayer" aria-hidden="true"></div>
+
+          <!-- Interactive Live Floating Poll & Prediction Widget -->
+          <div class="stage-poll-widget glass-panel hidden" id="stagePollWidget">
+            <div class="poll-widget-header">
+              <div class="poll-header-left">
+                <span class="poll-type-badge" id="pollTypeBadge">🗳️ LIVE POLL</span>
+                <span class="poll-timer-badge" id="pollTimerBadge">⏱️ 00:60</span>
+              </div>
+              <div class="poll-header-right">
+                <button class="poll-ctrl-btn" id="pollMinimizeBtn" title="Minimize / Expand">▼</button>
+                <button class="poll-ctrl-btn poll-cancel-btn hidden" id="pollHostCancelBtn" title="Cancel Poll">✕</button>
+              </div>
+            </div>
+
+            <div class="poll-widget-body" id="pollWidgetBody">
+              <h4 class="poll-question-text" id="pollQuestionText">Will streamer win this game?</h4>
+              
+              <div class="poll-stats-meta" id="pollStatsMeta">
+                <span id="pollTotalVotes">👥 0 votes</span>
+                <span class="poll-pot-tag hidden" id="pollPotTag">🪙 <strong id="pollPotAmount">0</strong> Pot</span>
+              </div>
+
+              <!-- Dynamic Options Container -->
+              <div class="poll-options-container" id="pollOptionsContainer">
+                <!-- Populated dynamically via JS -->
+              </div>
+
+              <!-- Host Settlement Toolbar (Visible only when poll is closed or host wants to declare winner early) -->
+              <div class="poll-host-actions hidden" id="pollHostActions">
+                <div class="poll-host-label">👑 Host Settlement: Declare Winner</div>
+                <div class="poll-host-settle-btns" id="pollHostSettleBtns">
+                  <!-- Populated dynamically -->
+                </div>
+              </div>
+
+              <!-- Settlement Victory Result Overlay -->
+              <div class="poll-result-banner hidden" id="pollResultBanner">
+                <div class="result-trophy">🎉</div>
+                <div class="result-winner-text" id="pollWinnerResultText">Option 1 Won!</div>
+                <div class="result-payout-text" id="pollPayoutResultText">+180 Coins won!</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Host Broadcast Studio Control HUD (Visible for Host) -->
+          <div class="host-hud glass-panel hidden" id="hostHud">
+            <div class="hud-group">
+              <button id="hudMicBtn" class="hud-btn" title="Toggle Microphone (M)">🎙️ <span class="hud-lbl">Mic</span></button>
+              <button id="hudCamBtn" class="hud-btn" title="Toggle Camera (C)">📷 <span class="hud-lbl">Cam</span></button>
+              <button id="hudScreenBtn" class="hud-btn" title="Share Screen (S)">🖥️ <span class="hud-lbl">Screen</span></button>
+              <button id="hudFilterBtn" class="hud-btn" title="Video Beauty Filters">✨ <span class="hud-lbl">Filter</span></button>
+            </div>
+            
+            <div class="hud-group">
+              <button id="hudSoundboardBtn" class="hud-btn hud-soundboard" title="Open Sound FX Pad">🎛️ <span class="hud-lbl">FX Pad</span></button>
+              <button id="hudWheelBtn" class="hud-btn hud-wheel" title="Launch Wheel of Fortune">🎡 <span class="hud-lbl">Wheel</span></button>
+              <button id="hudChestBtn" class="hud-btn hud-chest" title="Drop Lucky Treasure Chest">🎁 <span class="hud-lbl">Drop Chest</span></button>
+              <button id="hudPollBtn" class="hud-btn hud-poll" title="Create Live Poll or Prediction">📊 <span class="hud-lbl">Poll/Bet</span></button>
+              <button id="hudPkBtn" class="hud-btn hud-pk" title="Challenge Streamer to PK Battle">⚔️ <span class="hud-lbl">PK Battle</span></button>
+              <button id="hudEndBtn" class="hud-btn hud-danger" title="End Stream">⏹️ <span class="hud-lbl">End Live</span></button>
+            </div>
+          </div>
+
+        </div><!-- /video-stage -->
+
+        <!-- Bottom Stream Interactive Toolbar -->
+        <div class="stage-toolbar glass-panel">
+          <!-- Quick Reactions Bar -->
+          <div class="quick-reactions">
+            <span class="reactions-title">React:</span>
+            <button class="btn-react" data-emoji="❤️" title="Love">❤️</button>
+            <button class="btn-react" data-emoji="🔥" title="Fire">🔥</button>
+            <button class="btn-react" data-emoji="👏" title="Clap">👏</button>
+            <button class="btn-react" data-emoji="🎉" title="Party">🎉</button>
+            <button class="btn-react" data-emoji="💎" title="Diamond">💎</button>
+            <button class="btn-react" data-emoji="🚀" title="Rocket">🚀</button>
+            <button class="btn-react" data-emoji="💯" title="100">💯</button>
+          </div>
+
+          <!-- Interactive Action Buttons -->
+          <div class="stage-actions-right">
+            <button class="btn btn-superchat" id="openSuperChatBtn" title="Send a Super Chat message">💬 Super Chat</button>
+            <button class="btn btn-gift pulse-glow" id="openGiftDrawerBtn" title="Send Virtual Gifts">🎁 Send Gift</button>
+            <button class="btn-like-heart" id="likeStreamBtn" title="Double tap or click to like">
+              <span class="heart-icon">💖</span>
+              <span class="like-counter" id="likeCounterBtn">Like</span>
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ─── SIDEBAR COLUMN (CHAT, VIEWERS, SUPPORTERS) ─── -->
+      <aside class="room-sidebar glass-panel">
+        
+        <!-- Tab Selectors -->
+        <div class="sidebar-tabs">
+          <button class="tab-btn active" data-tab="chat">💬 Live Chat</button>
+          <button class="tab-btn" data-tab="viewers">👥 Viewers (<span id="tabViewerCount">0</span>)</button>
+          <button class="tab-btn" data-tab="supporters">🏆 Top VIPs</button>
+          <button class="tab-btn" data-tab="info">ℹ️ Info</button>
+        </div>
+
+        <!-- Pinned Announcement Banner (if any) -->
+        <div class="pinned-banner hidden" id="pinnedBanner">
+          <span class="pin-icon">📌</span>
+          <span class="pinned-text" id="pinnedText">Pinned announcement</span>
+          <button class="pin-close-btn" id="unpinBtn" title="Dismiss pin">×</button>
+        </div>
+
+        <!-- ── TAB 1: CHAT ── -->
+        <div class="tab-panel active" id="tab-chat">
+          <ul class="chat-messages-list" id="chatList" role="log" aria-live="polite">
+            <!-- Messages rendered dynamically -->
+          </ul>
+
+          <!-- Chat Input Form -->
+          <form class="chat-form" id="chatForm">
+            <input type="text" id="chatInput" class="chat-input" placeholder="Say something in live chat…" maxlength="300" autocomplete="off" />
+            <button type="button" class="btn-emoji-toggle" id="emojiToggleBtn" title="Quick Emojis">😀</button>
+            <button type="submit" class="btn-send-chat" id="sendChatBtn" aria-label="Send message">↑</button>
+          </form>
+
+          <!-- Quick Emoji Popup Picker -->
+          <div class="emoji-picker-popup hidden" id="emojiPicker">
+            <span>✨</span><span>🔥</span><span>❤️</span><span>😂</span><span>👏</span>
+            <span>🎉</span><span>👑</span><span>🚀</span><span>💯</span><span>💃</span>
+            <span>💎</span><span>🌟</span><span>🥳</span><span>😎</span><span>🙌</span>
+          </div>
+        </div>
+
+        <!-- ── TAB 2: VIEWERS LIST ── -->
+        <div class="tab-panel" id="tab-viewers">
+          <div class="viewers-header">
+            <span class="viewers-count-big" id="viewersListBig">0</span>
+            <span>People tuned into this stream</span>
+          </div>
+          <ul class="viewers-list" id="viewersList">
+            <!-- Viewers items rendered dynamically -->
+          </ul>
+        </div>
+
+        <!-- ── TAB 3: TOP SUPPORTERS LEADERBOARD ── -->
+        <div class="tab-panel" id="tab-supporters">
+          <div class="supporters-header">
+            <span class="supporters-trophy">🏆</span>
+            <h3>Stream Leaderboard</h3>
+            <p>Top supporters who showered gifts in this stream!</p>
+          </div>
+          <ul class="supporters-list" id="supportersList">
+            <!-- Rendered dynamically -->
+          </ul>
+        </div>
+
+        <!-- ── TAB 4: STREAM INFO & SHORTCUTS ── -->
+        <div class="tab-panel" id="tab-info">
+          <div class="info-card">
+            <h4>Stream Details</h4>
+            <div class="info-row"><span>Host</span><strong id="infoHostName">—</strong></div>
+            <div class="info-row"><span>Category</span><strong id="infoCategory">—</strong></div>
+            <div class="info-row"><span>Video Quality</span><strong id="infoQuality">HD 720p</strong></div>
+            <div class="info-row"><span>Protocol</span><strong>Mediasoup WebRTC</strong></div>
+          </div>
+
+          <div class="info-card">
+            <h4>Keyboard Shortcuts</h4>
+            <div class="shortcut-item"><kbd>M</kbd> <span>Toggle Microphone</span></div>
+            <div class="shortcut-item"><kbd>C</kbd> <span>Toggle Camera</span></div>
+            <div class="shortcut-item"><kbd>S</kbd> <span>Toggle Screen Share</span></div>
+            <div class="shortcut-item"><kbd>Enter</kbd> <span>Send Chat Message</span></div>
+          </div>
+        </div>
+
+      </aside>
+
+    </div><!-- /room-body -->
+  </div><!-- /page-room -->
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL 1: GO LIVE SETUP
+       ══════════════════════════════════════════════════ -->
+  <div class="modal-backdrop hidden" id="modalCreateRoom">
+    <div class="modal-card glass-panel">
+      <div class="modal-header">
+        <h2>🎙️ Start Your Live Stream</h2>
+        <button class="modal-close-btn" id="closeCreateRoomBtn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="streamTitleInput">Stream Title</label>
+          <input type="text" id="streamTitleInput" class="input-field" placeholder="Give your stream an awesome title…" maxlength="80" value="Welcome to my Live Stream! ✨" />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group half">
+            <label for="streamCategorySelect">Category</label>
+            <select id="streamCategorySelect" class="select-field">
+              <option value="Chat">💬 Chat & IRL</option>
+              <option value="Music">🎵 Music & Singing</option>
+              <option value="Gaming">🎮 Gaming</option>
+              <option value="Dance">💃 Dance</option>
+              <option value="Talent">🌟 Talent Show</option>
+              <option value="Educational">📚 Educational</option>
+              <option value="Sports">⚡ Sports & Fitness</option>
+            </select>
+          </div>
+
+          <div class="form-group half">
+            <label for="streamQualitySelect">Broadcast Quality</label>
+            <select id="streamQualitySelect" class="select-field">
+              <option value="hd">HD 720p (Recommended)</option>
+              <option value="fhd">Full HD 1080p</option>
+              <option value="sd">SD 480p (Data Saver)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="streamTagsInput">Tags (comma separated)</label>
+          <input type="text" id="streamTagsInput" class="input-field" placeholder="e.g. music, fun, vibes, gaming" value="live, vibes" />
+        </div>
+
+        <div class="form-group">
+          <label for="streamPasswordInput">Room Password (Optional, leave blank for Public)</label>
+          <input type="password" id="streamPasswordInput" class="input-field" placeholder="Password for private VIP stream…" />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="cancelCreateRoomBtn">Cancel</button>
+        <button class="btn btn-primary btn-lg pulse-glow" id="submitStartStreamBtn">🔴 Start Broadcasting</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL 2: VIRTUAL GIFTS DRAWER
+       ══════════════════════════════════════════════════ -->
+  <div class="modal-backdrop hidden" id="modalGifts">
+    <div class="gifts-drawer glass-panel">
+      
+      <div class="drawer-header">
+        <div class="drawer-title-group">
+          <h3>🎁 Virtual Gift Catalog</h3>
+          <span class="drawer-sub">Send gifts to support the streamer and trigger full-screen animations!</span>
+        </div>
+
+        <div class="drawer-wallet">
+          <span class="coin-icon">🪙</span>
+          <span class="coin-val" id="drawerCoins">1,000</span>
+          <button class="btn btn-ghost btn-xs" id="drawerAddCoinsBtn">+ Get Free Coins</button>
+          <button class="modal-close-btn" id="closeGiftsBtn">✕</button>
+        </div>
+      </div>
+
+      <!-- Gift Multiplier Tabs -->
+      <div class="gift-mult-bar">
+        <span class="mult-label">Send Amount:</span>
+        <button class="mult-chip active" data-mult="1">x1</button>
+        <button class="mult-chip" data-mult="10">x10 (Combo)</button>
+        <button class="mult-chip" data-mult="99">x99 (Love)</button>
+        <button class="mult-chip" data-mult="520">x520 (Forever)</button>
+      </div>
+
+      <!-- Gift Grid -->
+      <div class="gifts-grid" id="giftsGrid">
+        <!-- 11 Catalog items generated dynamically -->
+      </div>
+
+      <!-- Drawer Footer & Send Combo Action -->
+      <div class="drawer-footer">
+        <div class="selected-gift-info" id="selectedGiftInfo">
+          <span class="sel-icon" id="selGiftIcon">🌹</span>
+          <div class="sel-text">
+            <strong id="selGiftName">Rose</strong>
+            <span id="selGiftCost">1 Coin</span>
+          </div>
+        </div>
+
+        <div class="gift-send-actions">
+          <button class="btn btn-primary btn-combo pulse-glow" id="sendGiftBtn">
+            <span class="send-text">Send Gift</span>
+            <span class="combo-counter hidden" id="comboCounter">COMBO x1!</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL 3: SUPER CHAT
+       ══════════════════════════════════════════════════ -->
+  <div class="modal-backdrop hidden" id="modalSuperChat">
+    <div class="modal-card glass-panel">
+      <div class="modal-header">
+        <h2>💬 Send Super Chat</h2>
+        <button class="modal-close-btn" id="closeSuperChatBtn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-hint">Highlight your message at the top of the chat and support the creator!</p>
+        
+        <div class="superchat-tier-grid">
+          <button class="tier-btn active" data-amount="50" style="--tier-color: hsl(200, 80%, 55%);">
+            <strong>🪙 50</strong><span>Blue Tier</span>
+          </button>
+          <button class="tier-btn" data-amount="100" style="--tier-color: hsl(152, 68%, 46%);">
+            <strong>🪙 100</strong><span>Green Tier</span>
+          </button>
+          <button class="tier-btn" data-amount="250" style="--tier-color: hsl(36, 95%, 54%);">
+            <strong>🪙 250</strong><span>Gold Tier</span>
+          </button>
+          <button class="tier-btn" data-amount="500" style="--tier-color: hsl(332, 80%, 58%);">
+            <strong>🪙 500</strong><span>Ruby Tier</span>
+          </button>
+          <button class="tier-btn" data-amount="1000" style="--tier-color: hsl(280, 85%, 65%);">
+            <strong>🪙 1,000</strong><span>Rainbow VIP</span>
+          </button>
+        </div>
+
+        <div class="form-group mt-3">
+          <label for="superChatMsgInput">Your Super Chat Message</label>
+          <textarea id="superChatMsgInput" class="textarea-field" placeholder="Write your spotlight message…" maxlength="200" rows="3"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="cancelSuperChatBtn">Cancel</button>
+        <button class="btn btn-primary pulse-glow" id="submitSuperChatBtn">✨ Send Super Chat (<span id="superChatBtnCost">50 Coins</span>)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL 4: PK BATTLE CHALLENGE
+       ══════════════════════════════════════════════════ -->
+  <div class="modal-backdrop hidden" id="modalPKChallenge">
+    <div class="modal-card glass-panel">
+      <div class="modal-header">
+        <h2>⚔️ Challenge Streamer to PK Battle</h2>
+        <button class="modal-close-btn" id="closePkModalBtn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-hint">Select an active live streamer to start a 5-minute head-to-head battle!</p>
+        <div class="pk-streamers-list" id="pkStreamersList">
+          <!-- Active streamers populated here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PK Incoming Invitation Dialog -->
+  <div class="modal-backdrop hidden" id="modalPkInvite">
+    <div class="modal-card glass-panel pk-invite-card">
+      <div class="pk-invite-badge">⚔️ PK CHALLENGE RECEIVED!</div>
+      <div class="pk-invite-avatar" id="pkInviteAvatar">🎙️</div>
+      <h3 id="pkInviteHost">Streamer has challenged you!</h3>
+      <p>5-minute Live PK Battle. The streamer with the most gift points wins!</p>
+      
+      <div class="modal-footer mt-3">
+        <button class="btn btn-ghost" id="declinePkBtn">Decline</button>
+        <button class="btn btn-primary pulse-glow" id="acceptPkBtn">🔥 Accept Challenge</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL: AUTHENTICATION (LOGIN, REGISTER & DEMO SWITCH)
+       ══════════════════════════════════════════════════ -->
+  <div class="modal-backdrop hidden" id="modalAuth">
+    <div class="modal-card glass-panel auth-modal-card">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:1.6rem;">🔐</span>
+          <div>
+            <h2 id="authModalTitle">Welcome to LiveWave</h2>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin:0;">Live Streaming, Creator Gifting & PK Battles</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeAuthBtn">✕</button>
+      </div>
+
+      <div class="modal-body auth-body">
+        <!-- Auth Tabs -->
+        <div class="auth-tabs">
+          <button class="auth-tab-btn active" data-authtab="login">🔑 Sign In</button>
+          <button class="auth-tab-btn" data-authtab="register">✨ Register</button>
+          <button class="auth-tab-btn" data-authtab="demos">⚡ Quick Switch</button>
+        </div>
+
+        <!-- Login Form -->
+        <div class="auth-panel" id="authLoginPanel">
+          <div class="form-group mt-3">
+            <label for="loginUsername">Username or Phone Number</label>
+            <input type="text" id="loginUsername" class="input-field" placeholder="e.g. Aria_Acoustic or Admin_Master" />
+          </div>
+
+          <div class="form-group mt-2">
+            <label for="loginPassword">Password / 6-Digit PIN</label>
+            <input type="password" id="loginPassword" class="input-field" placeholder="••••••••" />
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+            <label style="font-size:0.8rem; color:var(--text-muted); display:flex; align-items:center; gap:6px; cursor:pointer;">
+              <input type="checkbox" id="loginRememberMe" checked /> Remember session
+            </label>
+            <span style="font-size:0.75rem; color:var(--cyan); cursor:pointer;" onclick="alert('Default demo passwords: 123456 or admin123')">Demo PIN: 123456</span>
+          </div>
+
+          <button class="btn btn-primary w-100 mt-3 pulse-glow" id="btnSubmitLogin">
+            <span>🔑 Sign In to LiveWave</span>
+          </button>
+        </div>
+
+        <!-- Register Form -->
+        <div class="auth-panel hidden" id="authRegisterPanel">
+          <div class="form-group mt-3">
+            <label for="regUsername">Choose a Unique Username</label>
+            <input type="text" id="regUsername" class="input-field" placeholder="e.g. KinshasaStar" maxlength="24" />
+          </div>
+
+          <div class="form-group mt-2">
+            <label for="regPassword">Create Password / Security PIN</label>
+            <input type="password" id="regPassword" class="input-field" placeholder="At least 6 characters" />
+          </div>
+
+          <div class="form-group mt-2">
+            <label>I want to join as:</label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+              <label class="auth-role-card active" data-role="user">
+                <input type="radio" name="regRole" value="user" checked />
+                <span>👤 Viewer</span>
+              </label>
+              <label class="auth-role-card" data-role="streamer">
+                <input type="radio" name="regRole" value="streamer" />
+                <span>🎙️ Streamer</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="bonus-tag mt-2" style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:8px; padding:8px 12px; font-size:0.8rem; color:#fde047;">
+            🎁 <strong>+1,000 Free Starter Coins</strong> automatically credited to new accounts!
+          </div>
+
+          <button class="btn btn-primary w-100 mt-3 pulse-glow" id="btnSubmitRegister">
+            <span>✨ Create Account & Claim Bonus</span>
+          </button>
+        </div>
+
+        <!-- Quick Switch Demo Accounts Panel -->
+        <div class="auth-panel hidden" id="authDemosPanel">
+          <p style="font-size:0.82rem; color:var(--text-muted); margin-top:8px;">1-Click switch between pre-configured enterprise roles and streamer accounts:</p>
+          <div class="demo-accounts-grid">
+            <div class="demo-user-card" onclick="window.quickLogin('Admin_Master', 'admin123')">
+              <div class="demo-avatar" style="background:#ef4444;">🛡️</div>
+              <div class="demo-info">
+                <strong>@Admin_Master</strong>
+                <span>Lead Administrator · Lv.25</span>
+              </div>
+              <button class="btn btn-ghost btn-xs">Login</button>
+            </div>
+
+            <div class="demo-user-card" onclick="window.quickLogin('Aria_Acoustic', '123456')">
+              <div class="demo-avatar" style="background:#7c3aed;">🎸</div>
+              <div class="demo-info">
+                <strong>@Aria_Acoustic</strong>
+                <span>Verified Streamer · 34.2K Diamonds</span>
+              </div>
+              <button class="btn btn-ghost btn-xs">Login</button>
+            </div>
+
+            <div class="demo-user-card" onclick="window.quickLogin('ProGamer_Kai', '123456')">
+              <div class="demo-avatar" style="background:#06d6e0; color:#000;">🏆</div>
+              <div class="demo-info">
+                <strong>@ProGamer_Kai</strong>
+                <span>PK Champion · 52K Diamonds</span>
+              </div>
+              <button class="btn btn-ghost btn-xs">Login</button>
+            </div>
+
+            <div class="demo-user-card" onclick="window.quickLogin('ElenaDance', '123456')">
+              <div class="demo-avatar" style="background:#ec4899;">💃</div>
+              <div class="demo-info">
+                <strong>@ElenaDance</strong>
+                <span>Afro Dance · 29K Diamonds</span>
+              </div>
+              <button class="btn btn-ghost btn-xs">Login</button>
+            </div>
+
+            <div class="demo-user-card" onclick="window.quickLogin('CyberNova', '123456')">
+              <div class="demo-avatar" style="background:#eab308; color:#000;">💎</div>
+              <div class="demo-info">
+                <strong>@CyberNova</strong>
+                <span>VIP Gifter · 45K Coins</span>
+              </div>
+              <button class="btn btn-ghost btn-xs">Login</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL 5: USER PROFILE & WALLET
+       ══════════════════════════════════════════════════ -->
+  <div class="modal-backdrop hidden" id="modalProfile">
+    <div class="modal-card glass-panel profile-card">
+      <div class="modal-header">
+        <h2>👤 User Profile & Wallet</h2>
+        <button class="modal-close-btn" id="closeProfileBtn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="profile-hero">
+          <div class="profile-avatar-big" id="profileBigAvatar">👤</div>
+          <div class="profile-hero-meta">
+            <h3 id="profileName">Username</h3>
+            <div class="profile-level-badge" id="profileLevel">Level 1 Streamer</div>
+            <div class="profile-xp-bar-wrapper">
+              <div class="profile-xp-bar" id="profileXpBar" style="width: 25%;"></div>
+            </div>
+            <span class="xp-text" id="profileXpText">0 / 50 XP</span>
+          </div>
+        </div>
+
+        <div class="profile-stats-grid">
+          <div class="p-stat">
+            <strong id="profileFollowers">0</strong>
+            <span>Followers</span>
+          </div>
+          <div class="p-stat">
+            <strong id="profileFollowing">0</strong>
+            <span>Following</span>
+          </div>
+          <div class="p-stat">
+            <strong id="profileGiftsSent">0</strong>
+            <span>Gifts Sent</span>
+          </div>
+          <div class="p-stat">
+            <strong id="profileStreamsHosted">0</strong>
+            <span>Streams</span>
+          </div>
+        </div>
+
+        <div class="wallet-refill-section mt-3">
+          <label class="section-sublabel">🪙 Refill Free Virtual Coins (Sandbox)</label>
+          <div class="coin-packs-grid">
+            <button class="coin-pack-btn" data-coins="500"><strong>+500</strong><span>Starter</span></button>
+            <button class="coin-pack-btn" data-coins="2000"><strong>+2,000</strong><span>VIP Supporter</span></button>
+            <button class="coin-pack-btn" data-coins="10000"><strong>+10,000</strong><span>High Roller</span></button>
+            <button class="coin-pack-btn" data-coins="50000"><strong>+50,000</strong><span>Whale</span></button>
+          </div>
+        </div>
+
+        <div class="creator-earnings-preview mt-3">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <label class="section-sublabel" style="margin:0;">💎 Creator Earned Diamonds</label>
+            <span style="font-size:0.8rem; color:var(--cyan); font-weight:800;" id="profileDiamondsVal">0 Diamonds</span>
+          </div>
+        </div>
+
+        <div class="form-group mt-3">
+          <label for="profileBioInput">About You (Bio)</label>
+          <textarea id="profileBioInput" class="textarea-field" maxlength="200" rows="2" placeholder="Tell the community about yourself…"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" id="openCashoutFromProfileBtn" style="background:linear-gradient(135deg,#06d6a0,#059669); border:none;">💸 Cashout Diamonds (Mobile Money)</button>
+        <button class="btn btn-gold" id="openBuyCoinsFromProfileBtn">🪙 Buy Coins</button>
+        <button class="btn btn-ghost" id="openSwitchAccountBtn" style="color:var(--cyan);">🔄 Switch Account</button>
+        <button class="btn btn-primary" id="saveProfileBioBtn">Save Bio</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL: CREATOR CASHOUT & DIAMOND WITHDRAWAL (MOBILE MONEY DRC)
+       ══════════════════════════════════════════════════ -->
+  <div class="modal-backdrop hidden" id="modalCashout">
+    <div class="modal-card glass-panel cashout-modal-card">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:1.6rem;">💎</span>
+          <div>
+            <h2>Creator Diamond Cashout</h2>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin:0;">Withdraw your earned gift diamonds to Mobile Money (DRC) or Bank</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeCashoutBtn">✕</button>
+      </div>
+
+      <div class="modal-body cashout-body">
+        <!-- Diamond Balance Stats Card -->
+        <div class="cashout-stats-box">
+          <div class="cashout-stat-col">
+            <span class="stat-lbl">Diamond Balance</span>
+            <div class="stat-val"><span style="color:#38bdf8;">💎</span> <strong id="cashoutDiamondsVal">34,200</strong></div>
+          </div>
+          <div class="cashout-stat-divider"></div>
+          <div class="cashout-stat-col">
+            <span class="stat-lbl">Estimated Cash Value</span>
+            <div class="stat-val"><strong style="color:var(--gold);" id="cashoutUsdVal">$342.00</strong> <small style="font-size:0.75rem; color:var(--text-muted);" id="cashoutCdfVal">(~957,600 CDF)</small></div>
+          </div>
+        </div>
+
+        <!-- Withdrawal Amount Input -->
+        <div class="form-group mt-3">
+          <label for="cashoutDiamondsInput" style="display:flex; justify-content:space-between;">
+            <span>Diamonds to Withdraw (Min. 1,000 = $10.00)</span>
+            <button class="btn btn-ghost btn-xs" id="btnMaxCashout">Withdraw Max</button>
+          </label>
+          <div class="input-with-icon">
+            <span class="input-icon">💎</span>
+            <input type="number" id="cashoutDiamondsInput" class="input-field" placeholder="10000" min="1000" step="500" value="10000" />
+          </div>
+          <div class="cashout-calc-tag mt-1">
+            <span>You will receive: <strong style="color:var(--cyan);" id="calcReceiveUsd">$100.00</strong> <span id="calcReceiveCdf">(~280,000 CDF)</span></span>
+          </div>
+        </div>
+
+        <!-- Destination Payout Method -->
+        <div class="form-group mt-3">
+          <label>Payout Destination (Mobile Money DRC & Africa)</label>
+          <div class="payout-method-grid">
+            <label class="payout-method-card active" data-payout="Vodacom M-Pesa (DRC)">
+              <input type="radio" name="payoutMethod" value="Vodacom M-Pesa (DRC)" checked />
+              <span>🟢 Vodacom M-Pesa</span>
+            </label>
+            <label class="payout-method-card" data-payout="Airtel Money (DRC)">
+              <input type="radio" name="payoutMethod" value="Airtel Money (DRC)" />
+              <span>🔴 Airtel Money</span>
+            </label>
+            <label class="payout-method-card" data-payout="Orange Money (DRC)">
+              <input type="radio" name="payoutMethod" value="Orange Money (DRC)" />
+              <span>🟠 Orange Money</span>
+            </label>
+            <label class="payout-method-card" data-payout="Afrimoney (Africell DRC)">
+              <input type="radio" name="payoutMethod" value="Afrimoney (Africell DRC)" />
+              <span>🟣 Afrimoney</span>
+            </label>
+            <label class="payout-method-card" data-payout="Bank Wire / Pepele Mobile">
+              <input type="radio" name="payoutMethod" value="Bank Wire / Pepele Mobile" />
+              <span>🏦 Bank / Pepele</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Beneficiary Phone & Name -->
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;" class="mt-2">
+          <div class="form-group">
+            <label for="payoutPhoneInput">Mobile Money Phone Number</label>
+            <input type="tel" id="payoutPhoneInput" class="input-field" placeholder="+243 81 234 5678" value="+243 81 554 2291" />
+          </div>
+          <div class="form-group">
+            <label for="payoutNameInput">Account Holder Legal Name</label>
+            <input type="text" id="payoutNameInput" class="input-field" placeholder="Full Name on ID" value="Aria Kabamba" />
+          </div>
+        </div>
+
+        <!-- Payout History -->
+        <div class="payout-history-section mt-3">
+          <label class="section-sublabel">Recent Payout History</label>
+          <div class="payout-history-list" id="payoutHistoryList">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer cashout-footer">
+        <button class="btn btn-ghost" id="closeCashoutFooterBtn">Cancel</button>
+        <button class="btn btn-primary btn-lg pulse-glow" id="btnSubmitWithdrawal">
+          <span>💸 Submit Withdrawal Request</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL: BUY COINS & MOBILE MONEY RECHARGE (DRC / AFRICA)
+       ══════════════════════════════════════════════════ -->
+  <div class="modal-backdrop hidden" id="modalBuyCoins">
+    <div class="modal-card glass-panel buy-coins-card">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="font-size:1.6rem;">🪙</span>
+          <div>
+            <h2>Recharge LiveWave Coins</h2>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin:0;">Instant Mobile Money (DRC & Africa), Bank Cards & Crypto</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeBuyCoinsBtn">✕</button>
+      </div>
+
+      <div class="modal-body buy-coins-body">
+        
+        <!-- Step 1: Select Coin Package -->
+        <div class="recharge-step-title">
+          <span class="step-num">1</span>
+          <span>Select Coin Package</span>
+        </div>
+
+        <div class="coin-recharge-grid" id="coinRechargeGrid">
+          <!-- Dynamically populated from COIN_PACKAGES with USD & CDF / XAF prices -->
+        </div>
+
+        <!-- Step 2: Select Payment Method -->
+        <div class="recharge-step-title mt-3">
+          <span class="step-num">2</span>
+          <span>Choose Payment Method</span>
+        </div>
+
+        <div class="payment-method-tabs">
+          <button class="pay-tab-btn active" data-paymethod="mobile_money">
+            <span>📱 Mobile Money</span>
+            <small style="color:var(--cyan); font-size:0.7rem; font-weight:700;">DRC & Africa</small>
+          </button>
+          <button class="pay-tab-btn" data-paymethod="card">
+            <span>💳 Bank Card</span>
+            <small style="font-size:0.7rem;">Visa / Mastercard</small>
+          </button>
+          <button class="pay-tab-btn" data-paymethod="maxicash">
+            <span>⚡ MaxiCash / FlexPaie</span>
+            <small style="font-size:0.7rem;">DRC Fintech</small>
+          </button>
+          <button class="pay-tab-btn" data-paymethod="crypto">
+            <span>🌐 Crypto</span>
+            <small style="font-size:0.7rem;">USDT / TON</small>
+          </button>
+        </div>
+
+        <!-- Mobile Money Operators Selection (DRC / Africa) -->
+        <div class="pay-panel-content" id="panelMobileMoney">
+          <label class="section-sublabel">Select Mobile Money Carrier</label>
+          <div class="operator-grid">
+            <label class="operator-card active" data-operator="Vodacom M-Pesa (DRC)">
+              <input type="radio" name="mno" value="Vodacom M-Pesa (DRC)" checked />
+              <div class="op-logo mpesa-logo">🟢</div>
+              <div class="op-info">
+                <strong>Vodacom M-Pesa</strong>
+                <span>DRC (081, 082, 083)</span>
+              </div>
+            </label>
+
+            <label class="operator-card" data-operator="Airtel Money (DRC)">
+              <input type="radio" name="mno" value="Airtel Money (DRC)" />
+              <div class="op-logo airtel-logo">🔴</div>
+              <div class="op-info">
+                <strong>Airtel Money</strong>
+                <span>DRC & Congo-Brazzaville</span>
+              </div>
+            </label>
+
+            <label class="operator-card" data-operator="Orange Money (DRC)">
+              <input type="radio" name="mno" value="Orange Money (DRC)" />
+              <div class="op-logo orange-logo">🟠</div>
+              <div class="op-info">
+                <strong>Orange Money</strong>
+                <span>DRC (084, 085, 089)</span>
+              </div>
+            </label>
+
+            <label class="operator-card" data-operator="Afrimoney (Africell DRC)">
+              <input type="radio" name="mno" value="Afrimoney (Africell DRC)" />
+              <div class="op-logo afrimoney-logo">🟣</div>
+              <div class="op-info">
+                <strong>Afrimoney</strong>
+                <span>Africell DRC (090, 091)</span>
+              </div>
+            </label>
+
+            <label class="operator-card" data-operator="MTN MoMo (Congo-Brazzaville)">
+              <input type="radio" name="mno" value="MTN MoMo (Congo-Brazzaville)" />
+              <div class="op-logo momo-logo">🟡</div>
+              <div class="op-info">
+                <strong>MTN MoMo</strong>
+                <span>Congo-Brazzaville / Africa</span>
+              </div>
+            </label>
+          </div>
+
+          <div class="form-group mt-2">
+            <label for="mnoPhoneInput" style="display:flex; justify-content:space-between;">
+              <span>Mobile Phone Number</span>
+              <span id="detectedOperatorBadge" class="detected-op-badge">🟢 Vodacom M-Pesa</span>
+            </label>
+            <div class="phone-input-group">
+              <select id="countryCodeSelect" class="country-code-select">
+                <option value="+243" selected>🇨🇩 +243 (DRC)</option>
+                <option value="+242">🇨🇬 +242 (Congo-Brazzaville)</option>
+                <option value="+237">🇨🇲 +237 (Cameroon)</option>
+                <option value="+225">🇨🇮 +225 (Côte d'Ivoire)</option>
+                <option value="+254">🇰🇪 +254 (Kenya)</option>
+              </select>
+              <input type="tel" id="mnoPhoneInput" class="input-field" placeholder="81 234 5678" value="819928172" />
+            </div>
+            <small style="color:var(--text-muted); font-size:0.75rem; display:block; margin-top:4px;">
+              📲 A secure USSD confirmation prompt will be sent to this phone to enter your Mobile Money PIN.
+            </small>
+          </div>
+        </div>
+
+        <!-- Bank Card Panel -->
+        <div class="pay-panel-content hidden" id="panelCard">
+          <div class="form-group">
+            <label>Card Number</label>
+            <input type="text" class="input-field" placeholder="4532 •••• •••• 8921" value="4532 8920 1829 3921" />
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <div class="form-group">
+              <label>Expiry (MM/YY)</label>
+              <input type="text" class="input-field" placeholder="12/28" value="08/28" />
+            </div>
+            <div class="form-group">
+              <label>CVC</label>
+              <input type="password" class="input-field" placeholder="•••" value="882" maxlength="4" />
+            </div>
+          </div>
+        </div>
+
+        <!-- MaxiCash / FlexPay Panel -->
+        <div class="pay-panel-content hidden" id="panelMaxiCash">
+          <div style="padding:14px; background:rgba(6,214,230,0.08); border:1px solid rgba(6,214,230,0.3); border-radius:12px; font-size:0.85rem;">
+            <strong>⚡ MaxiCash & FlexPaie Direct Gateway</strong>
+            <p style="color:var(--text-muted); margin-top:4px;">Unified DRC payment gateway. Supports all local wallets, Rawbank Pepele Mobile, and IllicoCash.</p>
+          </div>
+        </div>
+
+        <!-- Crypto Panel -->
+        <div class="pay-panel-content hidden" id="panelCrypto">
+          <div style="padding:14px; background:rgba(245,158,11,0.08); border:1px solid rgba(245,158,11,0.3); border-radius:12px; font-size:0.85rem;">
+            <strong>🌐 USDT (TRC-20) / TON Instant Top-Up</strong>
+            <p style="color:var(--text-muted); margin-top:4px;">Zero foreign exchange fees. Instant blockchain confirmation and credit.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer buy-coins-footer">
+        <div class="checkout-summary">
+          <span style="font-size:0.8rem; color:var(--text-muted);">Total to Pay:</span>
+          <div style="display:flex; align-items:baseline; gap:6px;">
+            <strong style="font-size:1.35rem; color:#fff;" id="checkoutPriceUsd">$4.99</strong>
+            <span style="font-size:0.85rem; color:var(--gold); font-weight:700;" id="checkoutPriceCdf">(~14,000 CDF)</span>
+          </div>
+        </div>
+        <button class="btn btn-primary btn-lg pulse-glow" id="btnPayCoins">
+          <span>⚡ Pay & Recharge Coins</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- USSD Push Interactive Confirmation Modal -->
+  <div class="modal-backdrop hidden" id="modalUssdPush">
+    <div class="modal-card glass-panel ussd-card">
+      <div class="ussd-phone-mockup">
+        <div class="ussd-spinner">📲</div>
+        <h3>USSD Prompt Sent!</h3>
+        <p>Please check your phone (<strong id="ussdTargetPhone">+243 81 992 8172</strong>) and enter your Mobile Money PIN on the screen prompt to authorize:</p>
+        
+        <div class="ussd-summary-box">
+          <div class="ussd-row">
+            <span>Operator:</span>
+            <strong id="ussdOperatorName">Vodacom M-Pesa</strong>
+          </div>
+          <div class="ussd-row">
+            <span>Recharge:</span>
+            <strong style="color:var(--gold);" id="ussdCoinsAmount">+5,500 Coins</strong>
+          </div>
+          <div class="ussd-row">
+            <span>Amount:</span>
+            <strong id="ussdPriceAmount">14,000 CDF ($4.99)</strong>
+          </div>
+        </div>
+
+        <div class="ussd-countdown">
+          <span>Awaiting PIN Authorization: <strong id="ussdTimer" style="color:var(--cyan);">15s</strong></span>
+          <div class="ussd-progress-bar">
+            <div class="ussd-progress-fill" id="ussdProgressFill" style="width:100%;"></div>
+          </div>
+        </div>
+
+        <div class="ussd-actions mt-3">
+          <button class="btn btn-primary w-100" id="btnSimulatePinSuccess">✓ Simulate PIN Confirmed</button>
+          <button class="btn btn-ghost btn-sm mt-2" id="btnCancelUssd">Cancel Transaction</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL 6: VIDEO BEAUTY & COLOR FILTERS
+       ══════════════════════════════════════════════════ -->
+  <div class="modal-backdrop hidden" id="modalFilters">
+    <div class="modal-card glass-panel filter-modal-card">
+      <div class="modal-header">
+        <h2>✨ Camera Filters & Effects</h2>
+        <button class="modal-close-btn" id="closeFiltersBtn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="filters-grid">
+          <button class="filter-card active" data-filter="none">
+            <span class="f-icon">🌿</span><strong>Natural</strong>
+          </button>
+          <button class="filter-card" data-filter="beauty">
+            <span class="f-icon">✨</span><strong>Beauty Glow</strong>
+          </button>
+          <button class="filter-card" data-filter="cyberpunk">
+            <span class="f-icon">🌆</span><strong>Cyberpunk</strong>
+          </button>
+          <button class="filter-card" data-filter="warm">
+            <span class="f-icon">🌅</span><strong>Sunset Warm</strong>
+          </button>
+          <button class="filter-card" data-filter="cool">
+            <span class="f-icon">❄️</span><strong>Cool Ice</strong>
+          </button>
+          <button class="filter-card" data-filter="noir">
+            <span class="f-icon">🎬</span><strong>Classic Noir</strong>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL 7: CO-HOST INCOMING INVITATION
+       ══════════════════════════════════════════════════ -->
+  <div class="modal-backdrop hidden" id="modalCoHostInvite">
+    <div class="modal-card glass-panel cohost-invite-card">
+      <div class="cohost-invite-badge">🎙️ CO-HOST INVITATION</div>
+      <div class="cohost-invite-avatar" id="coHostInviteAvatar">🎙️</div>
+      <h3 id="coHostInviteHost">Streamer has invited you to co-host!</h3>
+      <p>Join the stage live with your camera and mic to broadcast together.</p>
+      
+      <div class="modal-footer mt-3">
+        <button class="btn btn-ghost" id="declineCoHostBtn">Decline</button>
+        <button class="btn btn-primary pulse-glow" id="acceptCoHostBtn">✨ Accept & Go Live</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       USER MODERATION CONTEXT MENU
+       ══════════════════════════════════════════════════ -->
+  <div class="user-context-menu glass-panel hidden" id="userContextMenu">
+    <div class="context-header" id="contextTargetName">User</div>
+    <button class="context-action highlight" id="ctxInviteCoHost">🎙️ Invite to Co-Host</button>
+    <button class="context-action" id="ctxViewProfile">👤 View Profile</button>
+    <button class="context-action" id="ctxMuteUser">🔇 Mute from Chat</button>
+    <button class="context-action" id="ctxPromoteMod">⭐ Promote to Mod</button>
+    <button class="context-action danger" id="ctxKickUser">👢 Kick from Stream</button>
+    <button class="context-action danger" id="ctxBanUser">🚫 Ban User</button>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL 8: CREATE LIVE POLL OR PREDICTION
+       ══════════════════════════════════════════════════ -->
+  <div class="modal-backdrop hidden" id="modalCreatePoll">
+    <div class="modal-card glass-panel create-poll-modal">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2>📊 Launch Live Poll or Prediction</h2>
+          <span class="modal-sub">Engage your audience with live voting or coin prediction bets!</span>
+        </div>
+        <button class="modal-close-btn" id="closeCreatePollBtn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Poll Type Selector -->
+        <div class="poll-type-toggle">
+          <button type="button" class="poll-type-btn active" data-type="casual" id="pollTypeCasualBtn">
+            <span class="type-icon">🗳️</span>
+            <div class="type-info">
+              <strong>Casual Poll</strong>
+              <span>Free community opinion</span>
+            </div>
+          </button>
+          <button type="button" class="poll-type-btn" data-type="prediction" id="pollTypePredictionBtn">
+            <span class="type-icon">💰</span>
+            <div class="type-info">
+              <strong>Coin Prediction</strong>
+              <span>Viewers wager coins on outcomes</span>
+            </div>
+          </button>
+        </div>
+
+        <!-- Question Input -->
+        <div class="form-group mt-3">
+          <label for="pollQuestionInput">Poll / Prediction Question</label>
+          <input type="text" id="pollQuestionInput" class="input-field" placeholder="e.g. Will I win this PK battle match?" maxlength="120" value="Will I win this live PK battle?" />
+        </div>
+
+        <!-- Dynamic Options Inputs -->
+        <div class="form-group">
+          <div class="options-header-row">
+            <label>Voting Choices (2 to 4)</label>
+            <button type="button" class="btn btn-ghost btn-xs" id="addPollOptionBtn">+ Add Choice</button>
+          </div>
+          <div class="poll-inputs-list" id="pollInputsList">
+            <div class="poll-option-row">
+              <span class="opt-num-badge color-1">1</span>
+              <input type="text" class="input-field poll-opt-input" placeholder="Choice 1" value="Yes! Victory 🚀" maxlength="50" />
+            </div>
+            <div class="poll-option-row">
+              <span class="opt-num-badge color-2">2</span>
+              <input type="text" class="input-field poll-opt-input" placeholder="Choice 2" value="No, tough opponent 💥" maxlength="50" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Prediction Wager Configuration (Visible only when type == prediction) -->
+        <div class="prediction-config-box hidden" id="predictionConfigBox">
+          <label>Stake Amount Per Vote</label>
+          <div class="wager-chips-row">
+            <button type="button" class="wager-chip" data-wager="10">🪙 10</button>
+            <button type="button" class="wager-chip active" data-wager="50">🪙 50</button>
+            <button type="button" class="wager-chip" data-wager="100">🪙 100</button>
+            <button type="button" class="wager-chip" data-wager="500">🪙 500</button>
+          </div>
+          <span class="form-hint">Winners split the total coin pot proportionally (minus 5% streamer bonus).</span>
+        </div>
+
+        <!-- Duration Selector -->
+        <div class="form-group">
+          <label>Voting Time Limit</label>
+          <div class="duration-chips-row">
+            <button type="button" class="duration-chip" data-sec="30">⏱️ 30s</button>
+            <button type="button" class="duration-chip active" data-sec="60">⏱️ 60s</button>
+            <button type="button" class="duration-chip" data-sec="120">⏱️ 2 min</button>
+            <button type="button" class="duration-chip" data-sec="300">⏱️ 5 min</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="cancelCreatePollBtn">Cancel</button>
+        <button class="btn btn-primary btn-lg pulse-glow" id="submitLaunchPollBtn">🚀 Launch Live Poll</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL 9: DROP LUCKY TREASURE CHEST
+       ══════════════════════════════════════════════════ -->
+  <div class="modal-backdrop hidden" id="modalDropChest">
+    <div class="modal-card glass-panel drop-chest-modal">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h2>🎁 Drop Lucky Treasure Chest</h2>
+          <span class="modal-sub">Shower viewers with a community coin air-drop!</span>
+        </div>
+        <button class="modal-close-btn" id="closeDropChestBtn">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Total Coin Air-Drop Amount</label>
+          <div class="chest-coin-chips">
+            <button type="button" class="chest-chip" data-coins="100">🪙 100</button>
+            <button type="button" class="chest-chip active" data-coins="500">🪙 500</button>
+            <button type="button" class="chest-chip" data-coins="1000">🪙 1,000</button>
+            <button type="button" class="chest-chip" data-coins="5000">🪙 5,000</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Number of Lucky Packets (Recipients)</label>
+          <div class="chest-packet-chips">
+            <button type="button" class="packet-chip" data-packets="5">👥 5 Viewers</button>
+            <button type="button" class="packet-chip active" data-packets="10">👥 10 Viewers</button>
+            <button type="button" class="packet-chip" data-packets="25">👥 25 Viewers</button>
+            <button type="button" class="packet-chip" data-packets="50">👥 50 Viewers</button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Countdown Timer Before Opening</label>
+          <div class="duration-chips-row">
+            <button type="button" class="chest-dur-chip" data-sec="30">⏱️ 30s</button>
+            <button type="button" class="chest-dur-chip active" data-sec="60">⏱️ 60s</button>
+            <button type="button" class="chest-dur-chip" data-sec="120">⏱️ 2 min</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="cancelDropChestBtn">Cancel</button>
+        <button class="btn btn-primary btn-lg pulse-glow" id="submitDropChestBtn">🎁 Drop Chest (<span id="dropCostLabel">500</span> Coins)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL 10: TREASURE CHEST WINNERS LIST
+       ══════════════════════════════════════════════════ -->
+  <div class="modal-backdrop hidden" id="modalChestGrabbers">
+    <div class="modal-card glass-panel chest-grabbers-modal">
+      <div class="modal-header">
+        <h2>🎁 Lucky Chest Winners</h2>
+        <button class="modal-close-btn" id="closeGrabbersModalBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="chest-summary-banner">
+          <span class="chest-sum-icon">👑</span>
+          <div>
+            <div id="grabbersChestTitle">Lucky Air-Drop by Host</div>
+            <span class="chest-sum-sub" id="grabbersChestSub">10 packets claimed</span>
+          </div>
+        </div>
+        <ul class="chest-grabbers-list" id="chestGrabbersList">
+          <!-- Populated dynamically -->
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       MODAL 11: CLIP HIGHLIGHT RECORDER PREVIEW
+       ══════════════════════════════════════════════════ -->
+  <div class="modal-backdrop hidden" id="modalClipPreview">
+    <div class="modal-card glass-panel clip-preview-modal">
+      <div class="modal-header">
+        <h2>📹 Stream Highlight Clip Captured!</h2>
+        <button class="modal-close-btn" id="closeClipPreviewBtn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="clip-video-wrapper">
+          <video id="clipPreviewVideo" controls autoplay playsinline class="clip-video-player"></video>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="dismissClipBtn">Dismiss</button>
+        <a class="btn btn-primary btn-lg pulse-glow" id="downloadClipLink" download="livewave_clip.webm">💾 Download Clip (.webm)</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       STREAM SUMMARY REPORT (Post-Stream)
+       ══════════════════════════════════════════════════ -->
+  <div class="modal-backdrop hidden" id="modalSummary">
+    <div class="modal-card glass-panel summary-card">
+      <div class="summary-icon">🎉</div>
+      <h2>Broadcast Ended</h2>
+      <p>Here is your stream performance summary!</p>
+
+      <div class="summary-stats-grid">
+        <div class="sum-stat">
+          <span class="sum-val" id="sumDuration">00:00</span>
+          <span class="sum-lbl">Stream Duration</span>
+        </div>
+        <div class="sum-stat">
+          <span class="sum-val" id="sumViewers">0</span>
+          <span class="sum-lbl">Peak Viewers</span>
+        </div>
+        <div class="sum-stat">
+          <span class="sum-val" id="sumLikes">0</span>
+          <span class="sum-lbl">Total Likes</span>
+        </div>
+        <div class="sum-stat">
+          <span class="sum-val" id="sumGifts">0</span>
+          <span class="sum-lbl">Gifts Received</span>
+        </div>
+      </div>
+
+      <div class="modal-footer mt-3">
+        <button class="btn btn-primary btn-lg" id="closeSummaryBtn">Return to Lobby</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- SCRIPTS -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="mediasoup-client.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#070913" />
+  <title>LiveWave — Next-Gen Interactive Live Streaming & Social Entertainment</title>
+  <meta name="description" content="Experience sub-second ultra-low latency live streaming with WebRTC SFU, intense PK battles, 3D animated virtual gifts, multi-guest co-hosting, and AI creator studio." />
+  
+  <!-- OpenGraph / Social Meta Tags -->
+  <meta property="og:title" content="LiveWave — Next-Gen Interactive Live Streaming" />
+  <meta property="og:description" content="Sub-150ms zero latency streaming, live PK battles, 3D virtual gifts, and 9-guest video seats." />
+  <meta property="og:type" content="website" />
+
+  <!-- Google Fonts: Outfit & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="landing.css" />
+</head>
+<body>
+
+  <!-- Fullscreen Particle Burst Canvas -->
+  <canvas id="landingParticleCanvas"></canvas>
+
+  <!-- Ambient Glowing Orbs Background -->
+  <div class="landing-bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════
+       GLOBAL LANDING HEADER & NAVIGATION
+       ══════════════════════════════════════════════════ -->
+  <header class="landing-header" id="landingHeader">
+    <div class="container header-container">
+      <a href="#hero" class="brand-logo">
+        <div class="brand-icon">🌊</div>
+        <span>Live<span class="gradient-text">Wave</span></span>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#simulator">PK Arena</a></li>
+          <li><a href="#gifts">3D Gifts</a></li>
+          <li><a href="#architecture">Architecture</a></li>
+          <li><a href="#livestreams">Live Streams</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </nav>
+
+      <!-- Header Actions -->
+      <div class="header-actions">
+        <button class="sound-toggle-btn" id="landingSoundToggle" title="Toggle Sound FX" aria-label="Toggle Sound Effects">🔊</button>
+        <a href="/admin" class="btn btn-ghost btn-sm" style="color:#d8b4fe;">🛡️ Admin</a>
+        <a href="/index.html" class="btn btn-ghost btn-sm">Explore Lobby</a>
+        <a href="/index.html" class="btn btn-primary btn-sm">
+          <span class="pulse-dot"></span>
+          <span>Launch App</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════════════════
+       HERO SECTION
+       ══════════════════════════════════════════════════ -->
+  <section class="hero-section" id="hero">
+    <div class="container hero-grid">
+      
+      <!-- Left Column: Copy & CTAs -->
+      <div class="hero-content">
+        <div class="section-badge">
+          <span>⚡ ZERO-LATENCY SFU</span>
+          <span>·</span>
+          <span>WEBRTC STREAMING</span>
+        </div>
+
+        <h1 class="hero-title">
+          Where Live Moments <br />
+          <span class="gradient-text">Become Legends.</span>
+        </h1>
+
+        <p class="hero-desc">
+          LiveWave delivers ultra-low latency real-time streaming packed with adrenaline-pumping PK Battles, interactive 3D virtual gifts, 9-guest video seats, and an AI-powered creator studio.
+        </p>
+
+        <div class="hero-actions-row">
+          <a href="/index.html" class="btn btn-primary btn-lg">
+            <span>🚀 Launch LiveWave App</span>
+          </a>
+          <a href="#simulator" class="btn btn-ghost btn-lg">
+            <span>⚔️ Play PK Simulator</span>
+          </a>
+        </div>
+
+        <div class="hero-stats-inline">
+          <div class="hero-stat-item">
+            <span class="hero-stat-num gradient-text-cyan">&lt; 150ms</span>
+            <span class="hero-stat-lbl">Ultra Latency</span>
+          </div>
+          <div class="hero-stat-item">
+            <span class="hero-stat-num gradient-text-gold">11+</span>
+            <span class="hero-stat-lbl">3D Virtual Gifts</span>
+          </div>
+          <div class="hero-stat-item">
+            <span class="hero-stat-num gradient-text">9 Seats</span>
+            <span class="hero-stat-lbl">Multi-Guest Video</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Interactive Stage Mockup -->
+      <div class="hero-mockup-wrapper">
+        
+        <!-- Floating Decor Badges -->
+        <div class="floating-badge-decor decor-badge-1">
+          <span>🔥</span>
+          <div>
+            <strong>PK Combo 12x</strong>
+            <div style="font-size:0.72rem; color:var(--text-muted)">StarlightAlex on Fire!</div>
+          </div>
+        </div>
+
+        <div class="floating-badge-decor decor-badge-2">
+          <span>👑</span>
+          <div>
+            <strong>MVP Top Gifter</strong>
+            <div style="font-size:0.72rem; color:var(--gold)">12,500 Coins Sent</div>
+          </div>
+        </div>
+
+        <div class="hero-mockup-card">
+          <div class="mockup-stage">
+            
+            <!-- Stage Top Bar -->
+            <div class="mockup-header">
+              <div class="mockup-streamer-info">
+                <div class="mockup-avatar">🎙️</div>
+                <span class="mockup-name">Aria & Kai PK Duel</span>
+              </div>
+              <div class="mockup-live-badge">
+                <span class="pulse-dot"></span>
+                <span>LIVE 4.2k</span>
+              </div>
+            </div>
+
+            <!-- PK Split Screen Arena -->
+            <div class="mockup-pk-split">
+              
+              <!-- Blue Half -->
+              <div class="mockup-stream-half stream-blue">
+                <div class="stream-host-avatar-large">👩‍🎤</div>
+              </div>
+
+              <!-- Center VS Circle -->
+              <div class="mockup-vs-badge">VS</div>
+
+              <!-- Red Half -->
+              <div class="mockup-stream-half stream-red">
+                <div class="stream-host-avatar-large">🧑‍🎤</div>
+              </div>
+
+              <!-- Danmaku Flying Bullets Layer -->
+              <div class="mockup-danmaku-layer">
+                <span class="mockup-bullet mockup-bullet-1">🔥 Team Blue let's GOOO!</span>
+                <span class="mockup-bullet mockup-bullet-2">💎 Luxury Car incoming!! 🏎️</span>
+                <span class="mockup-bullet mockup-bullet-3">💖 Singing requests open!</span>
+              </div>
+
+              <!-- Floating Gift Pill -->
+              <div class="mockup-floating-gift">
+                <span>🚀</span>
+                <span style="font-size:0.8rem; font-weight:800; color:#fff">Rocket x5 Combo!</span>
+              </div>
+
+            </div>
+
+            <!-- PK Realtime Tug-of-war Bar -->
+            <div class="mockup-pk-bar-wrap">
+              <div class="mockup-pk-bar">
+                <div class="mockup-pk-blue-bar"></div>
+                <div class="mockup-pk-red-bar"></div>
+              </div>
+              <div class="mockup-pk-scores-row">
+                <span class="blue-score-tag">🔵 14,820 pts</span>
+                <span class="red-score-tag">🔴 11,240 pts</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       STATS TICKER STRIP
+       ══════════════════════════════════════════════════ -->
+  <section class="stats-ticker-section">
+    <div class="container stats-ticker-grid">
+      
+      <div class="ticker-card">
+        <div class="ticker-icon">⚡</div>
+        <div class="ticker-info">
+          <strong>Mediasoup SFU</strong>
+          <span>Sub-second WebRTC router pipeline</span>
+        </div>
+      </div>
+
+      <div class="ticker-card">
+        <div class="ticker-icon">⚔️</div>
+        <div class="ticker-info">
+          <strong>Live PK Duels</strong>
+          <span>Dynamic real-time score battles</span>
+        </div>
+      </div>
+
+      <div class="ticker-card">
+        <div class="ticker-icon">🎁</div>
+        <div class="ticker-info">
+          <strong>Virtual Economy</strong>
+          <span>Tiered gifts, combos & VIP marquees</span>
+        </div>
+      </div>
+
+      <div class="ticker-card">
+        <div class="ticker-icon">🎛️</div>
+        <div class="ticker-info">
+          <strong>Creator Studio</strong>
+          <span>Face beauty, soundboard & canvas filters</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       BENTO GRID: CORE PLATFORM FEATURES
+       ══════════════════════════════════════════════════ -->
+  <section class="features-section" id="features">
+    <div class="container">
+      
+      <div class="section-header">
+        <div class="section-badge">✨ COMPLETE PLATFORM SUITE</div>
+        <h2 class="section-title">Engineered for Maximum Engagement</h2>
+        <p class="section-subtitle">Everything creators and fans need for world-class interactive live entertainment.</p>
+      </div>
+
+      <div class="bento-grid">
+        
+        <!-- Bento Card 1: PK Battles (Span 2) -->
+        <div class="glass-panel bento-card span-2">
+          <div class="bento-card-icon">⚔️</div>
+          <h3>Head-to-Head Live PK Battles</h3>
+          <p>Streamers can challenge rivals in intense real-time duels. Viewers rally behind their favorite host by gifting to tilt the tug-of-war score bar, trigger combo multipliers, and activate punishment wheels for the loser.</p>
+          
+          <div class="bento-visual-pk">
+            <div class="visual-pk-bar">
+              <div class="visual-pk-blue"></div>
+              <div class="visual-pk-red"></div>
+            </div>
+            <div class="visual-pk-legend">
+              <span style="color:#60a5fa">🔵 Host A (65%)</span>
+              <span style="color:#f87171">🔴 Host B (35%)</span>
+            </div>
+          </div>
+
+          <div class="bento-tag-list">
+            <span class="bento-tag">Split Video Canvas</span>
+            <span class="bento-tag">Combo Multipliers</span>
+            <span class="bento-tag">Punishment Minigames</span>
+            <span class="bento-tag">Realtime Sync</span>
+          </div>
+        </div>
+
+        <!-- Bento Card 2: 3D Gifts -->
+        <div class="glass-panel bento-card">
+          <div class="bento-card-icon">💎</div>
+          <h3>Tiered Virtual Gift Economy</h3>
+          <p>Over 11 animated gifts ranging from Roses and Diamonds to Luxury Cars, Megayachts, and Moon Drops. VIP gifts trigger full-screen particle explosions and global marquee announcements.</p>
+          <div class="bento-tag-list">
+            <span class="bento-tag">Combos x99</span>
+            <span class="bento-tag">VIP Marquees</span>
+            <span class="bento-tag">Wallet Balance</span>
+          </div>
+        </div>
+
+        <!-- Bento Card 3: Multi-Guest Seats -->
+        <div class="glass-panel bento-card">
+          <div class="bento-card-icon">👥</div>
+          <h3>Multi-Guest 4 & 9 Video Seats</h3>
+          <p>Invite fans or guest creators onto the stage in real-time. Features interactive request queues, mute controls, and low-latency audio/video feeds.</p>
+          <div class="bento-tag-list">
+            <span class="bento-tag">9-Seat Grid</span>
+            <span class="bento-tag">Moderator Queues</span>
+            <span class="bento-tag">Co-Hosting</span>
+          </div>
+        </div>
+
+        <!-- Bento Card 4: Creator Studio (Span 2) -->
+        <div class="glass-panel bento-card span-2">
+          <div class="bento-card-icon">🎨</div>
+          <h3>Pro Creator Studio & Beauty FX</h3>
+          <p>High-end broadcaster toolkit running 100% client-side in the browser: real-time virtual background blur/replacement, skin smoothing, face glow contouring, 8-pad soundboard SFX dock, and instant highlight clip recording.</p>
+          <div class="bento-tag-list">
+            <span class="bento-tag">AI Face Beauty</span>
+            <span class="bento-tag">Virtual Background Blur</span>
+            <span class="bento-tag">Soundboard FX</span>
+            <span class="bento-tag">Clip Recorder</span>
+          </div>
+        </div>
+
+        <!-- Bento Card 5: Danmaku & Lucky Chests -->
+        <div class="glass-panel bento-card">
+          <div class="bento-card-icon">💬</div>
+          <h3>Danmaku Chat & Lucky Chests</h3>
+          <p>Japanese Danmaku flying bullet comments soar across the screen in real-time. Hosts can drop Lucky Coin Chests with countdown timers for viewer prize grabs.</p>
+          <div class="bento-tag-list">
+            <span class="bento-tag">Flying Bullet Chat</span>
+            <span class="bento-tag">Lucky Coin Drops</span>
+            <span class="bento-tag">Interactive Badges</span>
+          </div>
+        </div>
+
+        <!-- Bento Card 6: Gamification & Levels (Span 2) -->
+        <div class="glass-panel bento-card span-2">
+          <div class="bento-card-icon">🏆</div>
+          <h3>Gamification, Levels & Leaderboards</h3>
+          <p>Every gift, watch hour, and battle earns user XP. Unlock prestigious level badges, custom avatar frames, top supporter leaderboard slots, and fan club memberships.</p>
+          <div class="bento-tag-list">
+            <span class="bento-tag">Level XP System</span>
+            <span class="bento-tag">Daily Leaderboards</span>
+            <span class="bento-tag">Gifter Rankings</span>
+            <span class="bento-tag">Custom Badges</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       INTERACTIVE PK BATTLE SIMULATOR
+       ══════════════════════════════════════════════════ -->
+  <section class="simulator-section" id="simulator">
+    <div class="container">
+      
+      <div class="section-header">
+        <div class="section-badge">🎮 TEST DRIVE IN BROWSER</div>
+        <h2 class="section-title">Interactive PK Arena Simulator</h2>
+        <p class="section-subtitle">Click the gift buttons below for Team Blue or Team Red to see real-time score tug-of-war and particle effects in action!</p>
+      </div>
+
+      <div class="glass-panel simulator-card">
+        
+        <!-- Arena Top Details -->
+        <div class="sim-arena-top">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span class="pulse-dot"></span>
+            <strong>LIVE SIMULATED PK MATCH</strong>
+          </div>
+          <div class="sim-timer-pill">
+            <span>⏱️ </span>
+            <span id="simTimerText">03:00</span>
+          </div>
+        </div>
+
+        <!-- Stage Host Dual Sides -->
+        <div class="sim-battle-stage">
+          
+          <!-- Blue Team -->
+          <div class="sim-side blue">
+            <div class="sim-host-avatar">👩‍🎤</div>
+            <div class="sim-host-name">Team Blue (Luna)</div>
+            <div class="sim-host-score" id="simBlueScore">1,250</div>
+            
+            <div class="sim-gift-buttons">
+              <button class="btn-sim-gift" data-team="blue" data-amount="10">🌹 Rose (+10)</button>
+              <button class="btn-sim-gift" data-team="blue" data-amount="50">💎 Diamond (+50)</button>
+              <button class="btn-sim-gift" data-team="blue" data-amount="250">👑 Crown (+250)</button>
+            </div>
+          </div>
+
+          <!-- Red Team -->
+          <div class="sim-side red">
+            <div class="sim-host-avatar">🧑‍🎤</div>
+            <div class="sim-host-name">Team Red (Orion)</div>
+            <div class="sim-host-score" id="simRedScore">980</div>
+
+            <div class="sim-gift-buttons">
+              <button class="btn-sim-gift" data-team="red" data-amount="10">🌹 Rose (+10)</button>
+              <button class="btn-sim-gift" data-team="red" data-amount="50">💎 Diamond (+50)</button>
+              <button class="btn-sim-gift" data-team="red" data-amount="250">👑 Crown (+250)</button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Dynamic Tug-of-War Score Bar -->
+        <div class="sim-progress-wrap">
+          <div class="sim-bar-shell">
+            <div class="sim-bar-blue" id="simBarBlue"></div>
+            <div class="sim-bar-red" id="simBarRed"></div>
+          </div>
+        </div>
+
+        <p class="sim-footer-note">
+          💡 Click gifts repeatedly to trigger Web Audio sound synthesis and physics-driven confetti bursts!
+        </p>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       INTERACTIVE 3D GIFT GALLERY
+       ══════════════════════════════════════════════════ -->
+  <section class="gifts-section" id="gifts">
+    <div class="container">
+      
+      <div class="section-header">
+        <div class="section-badge">🎁 VIRTUAL ECONOMY</div>
+        <h2 class="section-title">Spectacular Gift Catalog</h2>
+        <p class="section-subtitle">Click any gift below to test-fire full-screen particle explosions and VIP marquee alerts.</p>
+      </div>
+
+      <!-- Demo Marquee Announcement -->
+      <div class="gift-marquee-demo" style="margin-bottom: 30px;">
+        <span style="font-size:1.6rem;" id="demoMarqueeIcon">🏎️</span>
+        <div>
+          <strong style="color:var(--gold)" id="demoMarqueeUser">VIP Gifter</strong>
+          <span style="color:#fff" id="demoMarqueeText">sent a Luxury Car!</span>
+        </div>
+        <span class="bento-tag" style="background:var(--gold); color:#000; font-weight:900;">VIP EFFECT</span>
+      </div>
+
+      <!-- Gift Cards Grid -->
+      <div class="gift-gallery-grid">
+        
+        <div class="gift-card" data-name="Rose" data-icon="🌹" data-tier="small">
+          <div class="gift-icon-preview">🌹</div>
+          <div class="gift-name">Rose</div>
+          <div class="gift-price">🪙 1 Coin</div>
+        </div>
+
+        <div class="gift-card" data-name="Heart" data-icon="💖" data-tier="small">
+          <div class="gift-icon-preview">💖</div>
+          <div class="gift-name">Heart</div>
+          <div class="gift-price">🪙 5 Coins</div>
+        </div>
+
+        <div class="gift-card" data-name="Fire" data-icon="🔥" data-tier="small">
+          <div class="gift-icon-preview">🔥</div>
+          <div class="gift-name">Fire</div>
+          <div class="gift-price">🪙 10 Coins</div>
+        </div>
+
+        <div class="gift-card" data-name="Diamond" data-icon="💎" data-tier="medium">
+          <div class="gift-icon-preview">💎</div>
+          <div class="gift-name">Diamond</div>
+          <div class="gift-price">🪙 50 Coins</div>
+        </div>
+
+        <div class="gift-card" data-name="Rocket" data-icon="🚀" data-tier="medium">
+          <div class="gift-icon-preview">🚀</div>
+          <div class="gift-name">Rocket</div>
+          <div class="gift-price">🪙 100 Coins</div>
+        </div>
+
+        <div class="gift-card" data-name="Crown" data-icon="👑" data-tier="large">
+          <div class="gift-icon-preview">👑</div>
+          <div class="gift-name">Crown</div>
+          <div class="gift-price">🪙 250 Coins</div>
+        </div>
+
+        <div class="gift-card" data-name="Lion" data-icon="🦁" data-tier="large">
+          <div class="gift-icon-preview">🦁</div>
+          <div class="gift-name">Lion</div>
+          <div class="gift-price">🪙 500 Coins</div>
+        </div>
+
+        <div class="gift-card" data-name="Castle" data-icon="🏰" data-tier="large">
+          <div class="gift-icon-preview">🏰</div>
+          <div class="gift-name">Castle</div>
+          <div class="gift-price">🪙 1,000 Coins</div>
+        </div>
+
+        <div class="gift-card" data-name="Luxury Car" data-icon="🏎️" data-tier="large">
+          <div class="gift-icon-preview">🏎️</div>
+          <div class="gift-name">Luxury Car</div>
+          <div class="gift-price">🪙 2,500 Coins</div>
+        </div>
+
+        <div class="gift-card" data-name="Yacht" data-icon="🛥️" data-tier="large">
+          <div class="gift-icon-preview">🛥️</div>
+          <div class="gift-name">Yacht</div>
+          <div class="gift-price">🪙 5,000 Coins</div>
+        </div>
+
+        <div class="gift-card" data-name="Moon" data-icon="🌙" data-tier="large">
+          <div class="gift-icon-preview">🌙</div>
+          <div class="gift-name">Moon</div>
+          <div class="gift-price">🪙 10,000 Coins</div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       ARCHITECTURE & TECHNICAL SPECS
+       ══════════════════════════════════════════════════ -->
+  <section class="arch-section" id="architecture">
+    <div class="container">
+      
+      <div class="section-header">
+        <div class="section-badge">⚙️ CUTTING-EDGE STACK</div>
+        <h2 class="section-title">WebRTC SFU Architecture</h2>
+        <p class="section-subtitle">Why LiveWave achieves lightning-fast sub-second latency compared to legacy RTMP/HLS streams.</p>
+      </div>
+
+      <div class="arch-grid">
+        
+        <!-- Card 1: Core Technologies -->
+        <div class="glass-panel arch-card">
+          <h3>Built on High-Performance Standards</h3>
+          <p style="color:var(--text-muted); margin-top:8px;">LiveWave replaces outdated buffering pipelines with direct WebRTC transport channels.</p>
+
+          <ul class="arch-spec-list">
+            <li class="arch-spec-item">
+              <div class="arch-spec-icon">⚡</div>
+              <div>
+                <strong>Mediasoup C++ Core SFU</strong>
+                <div style="font-size:0.85rem; color:var(--text-muted)">High-throughput Selective Forwarding Unit for zero-loss routing without heavy server transcoding.</div>
+              </div>
+            </li>
+            <li class="arch-spec-item">
+              <div class="arch-spec-icon">🔄</div>
+              <div>
+                <strong>Socket.IO Real-Time Signaling</strong>
+                <div style="font-size:0.85rem; color:var(--text-muted)">Bi-directional WebSocket event bus for instant PK scores, Danmaku chat, and gift propagation.</div>
+              </div>
+            </li>
+            <li class="arch-spec-item">
+              <div class="arch-spec-icon">🛡️</div>
+              <div>
+                <strong>DTLS / SRTP End-to-End Encryption</strong>
+                <div style="font-size:0.85rem; color:var(--text-muted)">Enterprise-grade cryptographic security for all audio and video media packets.</div>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Card 2: Latency Benchmark Visualizer -->
+        <div class="glass-panel arch-card">
+          <h3>End-to-End Latency Benchmark</h3>
+          <p style="color:var(--text-muted); margin-top:8px;">Instant audience interaction is only possible with true sub-second streaming.</p>
+
+          <div class="latency-comparison">
+            
+            <div class="lat-row">
+              <div class="lat-label">
+                <span style="color:var(--success)">⚡ LiveWave (WebRTC SFU)</span>
+                <strong style="color:var(--success)">~120 ms</strong>
+              </div>
+              <div class="lat-track">
+                <div class="lat-fill-webrtc"></div>
+              </div>
+            </div>
+
+            <div class="lat-row" style="margin-top:14px;">
+              <div class="lat-label">
+                <span style="color:var(--text-muted)">Standard Low-Latency HLS (LL-HLS)</span>
+                <span>~3,500 ms</span>
+              </div>
+              <div class="lat-track">
+                <div style="width:35%; height:100%; background:var(--gold);"></div>
+              </div>
+            </div>
+
+            <div class="lat-row" style="margin-top:14px;">
+              <div class="lat-label">
+                <span style="color:var(--danger)">Legacy RTMP / Standard HLS</span>
+                <span style="color:var(--danger)">12,000+ ms</span>
+              </div>
+              <div class="lat-track">
+                <div class="lat-fill-hls"></div>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="margin-top:28px; padding:16px; background:rgba(0,0,0,0.35); border-radius:var(--r-md); border:1px solid var(--border-subtle)">
+            <strong style="color:#fff; font-size:0.9rem;">🎯 Real-Time Advantage:</strong>
+            <p style="color:var(--text-muted); font-size:0.85rem; margin-top:4px;">At 120ms latency, streamers react instantly to viewer comments, gifts, and PK score battles without awkward delays.</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       LIVE STREAM PREVIEW (Direct Server Connection)
+       ══════════════════════════════════════════════════ -->
+  <section class="live-streams-section" id="livestreams">
+    <div class="container">
+      
+      <div class="section-header">
+        <div class="section-badge">📡 DISCOVER CREATORS</div>
+        <h2 class="section-title">Explore Active Broadcasts</h2>
+        <p class="section-subtitle">Jump straight into ongoing live streams or launch your own studio broadcast.</p>
+      </div>
+
+      <div class="live-rooms-landing-grid" id="landingLiveRoomsGrid">
+        <!-- Dynamically populated from /api/rooms or featured mockups -->
+      </div>
+
+      <div style="text-align:center; margin-top:40px;">
+        <a href="/index.html" class="btn btn-primary btn-lg">
+          <span>👀 View All Streams in App</span>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       FAQ ACCORDION
+       ══════════════════════════════════════════════════ -->
+  <section class="faq-section" id="faq">
+    <div class="container">
+      
+      <div class="section-header">
+        <div class="section-badge">❓ QUESTIONS & ANSWERS</div>
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        <p class="section-subtitle">Everything you need to know about LiveWave platform architecture and capabilities.</p>
+      </div>
+
+      <div class="faq-list">
+        
+        <div class="glass-panel faq-item active">
+          <button class="faq-question">
+            <span>What makes LiveWave faster than standard streaming platforms?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            LiveWave is powered by a WebRTC Selective Forwarding Unit (SFU) utilizing Mediasoup. Instead of converting video into bulky HLS segments with 5–15 second buffer delays, WebRTC streams audio/video media packets directly in real time (&lt; 150ms), allowing instant conversation between streamer and audience.
+          </div>
+        </div>
+
+        <div class="glass-panel faq-item">
+          <button class="faq-question">
+            <span>How do Live PK Battles work?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            During a PK Battle, two live streamers are paired in split-screen format. Viewers from both communities gift in real-time, tilting the live tug-of-war progress bar. When the timer runs out, the winning host celebrates with victory fanfare and the losing host faces the punishment wheel!
+          </div>
+        </div>
+
+        <div class="glass-panel faq-item">
+          <button class="faq-question">
+            <span>Do I need to install any external apps or OBS plugins to broadcast?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            No! LiveWave is completely browser-native. You can broadcast in high definition directly from your browser with webcam, microphone, screen sharing, beauty filters, and soundboard effects with zero software downloads.
+          </div>
+        </div>
+
+        <div class="glass-panel faq-item">
+          <button class="faq-question">
+            <span>How does the virtual coin and gifting economy work?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            Users have an in-app coin wallet used to send gifts ranging from 1 coin (Roses) to 10,000 coins (Moons). Gifting raises your user XP level, awards custom badges, unlocks VIP stage marquees, and places you on top of the leaderboards.
+          </div>
+        </div>
+
+        <div class="glass-panel faq-item">
+          <button class="faq-question">
+            <span>Does LiveWave support mobile devices and tablets?</span>
+            <span class="faq-icon">+</span>
+          </button>
+          <div class="faq-answer">
+            Yes, LiveWave is fully responsive with mobile-optimized touch controls, gesture-friendly bottoms sheets, responsive video scaling, and floating Danmaku chat for iOS and Android web browsers.
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       HIGH-IMPACT CALL TO ACTION
+       ══════════════════════════════════════════════════ -->
+  <section class="cta-section">
+    <div class="container">
+      
+      <div class="cta-box">
+        <h2 class="cta-title">
+          Ready to Step Into the <br />
+          <span class="gradient-text">Live Spotlight?</span>
+        </h2>
+        <p class="cta-desc">
+          Join thousands of streamers and fans enjoying real-time zero-latency entertainment, PK duels, and spectacular virtual gifting today.
+        </p>
+        <div class="cta-actions">
+          <a href="/index.html" class="btn btn-primary btn-lg">
+            <span>🚀 Launch LiveWave Now</span>
+          </a>
+          <a href="/index.html" class="btn btn-gold btn-lg">
+            <span>🎙️ Start Broadcasting</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════════════════
+       FOOTER
+       ══════════════════════════════════════════════════ -->
+  <footer class="landing-footer">
+    <div class="container">
+      
+      <div class="footer-top-grid">
+        
+        <div class="footer-brand">
+          <a href="#hero" class="brand-logo">
+            <div class="brand-icon">🌊</div>
+            <span>Live<span class="gradient-text">Wave</span></span>
+          </a>
+          <p>The next-generation WebRTC live streaming platform designed for interactive social entertainment and gaming.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Platform</h4>
+          <ul>
+            <li><a href="/index.html">Live Lobby</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#simulator">PK Arena</a></li>
+            <li><a href="#gifts">Gift Catalog</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Technology</h4>
+          <ul>
+            <li><a href="#architecture">WebRTC SFU</a></li>
+            <li><a href="#architecture">Mediasoup Core</a></li>
+            <li><a href="#architecture">Socket.IO Events</a></li>
+            <li><a href="#faq">Architecture FAQ</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="/index.html">Start Broadcast</a></li>
+            <li><a href="/index.html">Top Leaderboards</a></li>
+            <li><a href="/index.html">Coin Wallet</a></li>
+            <li><a href="#hero">Back to Top ↑</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+        <div>© 2026 LiveWave Inc. All rights reserved. Sub-second interactive live streaming.</div>
+        <div style="display:flex; gap:16px;">
+          <span>Privacy Policy</span>
+          <span>·</span>
+          <span>Terms of Service</span>
+          <span>·</span>
+          <span>Community Guidelines</span>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Interactive Scripts -->
+  <script src="landing.js"></script>
+</body>
+</html>
