@@ -1008,12 +1008,14 @@ function broadcastRoomsList() {
       });
     });
 
-    socket.on('getCatalogs', (_, cb) => {
-      cb && cb({ categories: CATEGORIES, gifts: GIFT_CATALOG, rooms: allLiveRooms() });
+    socket.on('getCatalogs', (data, cb) => {
+      const ack = typeof data === 'function' ? data : cb;
+      ack && ack({ categories: CATEGORIES, gifts: GIFT_CATALOG, rooms: allLiveRooms() });
     });
 
-    socket.on('getRoomsList', (_, cb) => {
-      cb && cb(allLiveRooms());
+    socket.on('getRoomsList', (data, cb) => {
+      const ack = typeof data === 'function' ? data : cb;
+      ack && ack(allLiveRooms());
     });
 
     /* ─── Get/Update profile ─── */
@@ -1349,10 +1351,11 @@ function broadcastRoomsList() {
       } catch (e) { console.error('produce', e); cb({ error: e.message }); }
     });
 
-    socket.on('getProducers', (_, cb) => {
+    socket.on('getProducers', (data, cb) => {
+      const ack = typeof data === 'function' ? data : cb;
       const { room } = getPeerRoom(sid);
-      if (!room) return cb && cb([]);
-      cb(getProducersList(room, sid));
+      if (!room) return ack && ack([]);
+      ack && ack(getProducersList(room, sid));
     });
 
     socket.on('consume', async ({ transportId, producerId, rtpCapabilities, roomId }, cb) => {
@@ -2297,10 +2300,11 @@ function broadcastRoomsList() {
        END STREAM (host)
        ══════════════════════════════════════════════ */
 
-    socket.on('endStream', (_, cb) => {
+    socket.on('endStream', (data, cb) => {
+      const ack = typeof data === 'function' ? data : cb;
       const { room } = getPeerRoom(sid);
-      if (!room) return cb && cb({ error: 'Not in room' });
-      if (room.hostSocketId !== sid) return cb && cb({ error: 'Host only' });
+      if (!room) return ack && ack({ error: 'Not in room' });
+      if (room.hostSocketId !== sid) return ack && ack({ error: 'Host only' });
       room.isLive = false;
       // close all producers
       for (const [pid, p] of room.producers) {
@@ -2313,7 +2317,7 @@ function broadcastRoomsList() {
       if (room.pk?.active) endPK(room, true);
       if (room.poll?._ticker) try { clearInterval(room.poll._ticker); } catch(_){}
       broadcastRoomsList();
-      cb && cb({ ok: true });
+      ack && ack({ ok: true });
     });
 
     function serializePoll(poll) {

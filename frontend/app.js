@@ -706,13 +706,25 @@ async function consumeProducer(producerId, isPkOpponent = false) {
   const targetCard = isPkOpponent ? $('pkVideoCard') : $('remoteVideoCard');
 
   let stream = targetVideo.srcObject;
-  if (!(stream instanceof MediaStream)) {
+  if (stream instanceof MediaStream) {
+    if (params.kind === 'video') {
+      stream.getVideoTracks().forEach(t => {
+        try { t.stop(); } catch(_){}
+        stream.removeTrack(t);
+      });
+    } else if (params.kind === 'audio') {
+      stream.getAudioTracks().forEach(t => {
+        try { t.stop(); } catch(_){}
+        stream.removeTrack(t);
+      });
+    }
+  } else {
     stream = new MediaStream();
   }
   stream.addTrack(consumer.track);
 
   // Assign fresh stream reference so video element detects newly added tracks
-  targetVideo.srcObject = new MediaStream(stream.getTracks());
+  targetVideo.srcObject = stream;
   targetCard?.classList.remove('hidden');
   $('stageOffline')?.classList.add('hidden');
 
